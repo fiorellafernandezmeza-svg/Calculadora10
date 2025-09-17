@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime, timedelta
+import calendar
 
 # Datos de AFP combinados
 afp_dict = {
@@ -134,7 +135,7 @@ elif turno == "Rotativo":
 
 # Nuevas opciones de pago
 st.markdown("### 🗓️ Información de pago")
-tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal", "Mensual"])
+tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal"])
 turno_inicio_pago = st.selectbox("Turno del primer día de pago", ["Día", "Noche"])
 mes_pago = st.selectbox("Mes de pago", [calendar.month_name[i] for i in range(1, 13)])
 

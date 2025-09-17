@@ -34,7 +34,6 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                     if turno == "Noche - Rotativo":
                         extra_25 = tarifa_hora * (1.25 if tipo_trabajador == "Empleado" else 1.40)
                         extra_35 = tarifa_hora * (1.35 if tipo_trabajador == "Empleado" else 1.50)
-                        else:
                             extra_25 = tarifa_hora * 1.25
                             extra_35 = tarifa_hora * 1.35
                             return tarifa_hora, extra_25, extra_35
@@ -156,7 +155,6 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                                                                     pagos.append(neto_dia)   # domingo
                                                                                                     pagos.extend([total_noche]*5)  # lunes a viernes
                                                                                                     st.markdown("**Turno semanal (inicio Día):**")
-                                                                                                    else:
                                                                                                         pagos.append(total_noche)  # sábado
                                                                                                         pagos.append(neto_noche)   # domingo
                                                                                                         pagos.extend([total_dia]*5)  # lunes a viernes
@@ -183,7 +181,6 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                                                                                         semana_index = (fecha_sabado.day - 1) // 7
                                                                                                                         turno_sabado = turno_inicio_pago if semana_index % 2 == 0 else ("Día" if turno_inicio_pago == "Noche" else "Noche")
                                                                                                                         pago = neto_dia if turno_sabado == "Día" else neto_noche
-                                                                                                                        else:
                                                                                                                             semana_index = (dia - 1) // 7
                                                                                                                             turno_actual = turno_inicio_pago if semana_index % 2 == 0 else ("Día" if turno_inicio_pago == "Noche" else "Noche")
                                                                                                                             pago = total_dia if turno_actual == "Día" else total_noche

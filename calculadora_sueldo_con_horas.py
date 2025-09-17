@@ -145,27 +145,6 @@ def nombre_dia(fecha):
     dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
     return dias[fecha.weekday()]
 
-
-# Función corregida para construir quincena con lógica de domingo según turno del sábado anterior
-def construir_quincena(turno_inicio, mes_num, neto_dia_8h, neto_noche_8h, total_dia, total_noche):
-    quincena = []
-    year = 2025
-    turno_actual = turno_inicio
-    for dia in range(1, 16):
-        fecha = date(year, mes_num, dia)
-        nombre_dia = calendar.day_name[fecha.weekday()]
-        if nombre_dia == "Sunday":
-            # Determinar el turno del sábado anterior
-            turno_sabado = turno_actual
-            pago = neto_dia_8h if turno_sabado == "Día" else neto_noche_8h
-        else:
-            pago = total_dia if turno_actual == "Día" else total_noche
-            if nombre_dia == "Saturday":
-                turno_actual = "Noche" if turno_actual == "Día" else "Día"
-        quincena.append((dia, nombre_dia, round(pago, 2)))
-    return quincena
-
-
 # Mostrar cuadro según selección
 if turno == "Rotativo":
     if tipo_pago == "Semanal":
@@ -187,26 +166,29 @@ if turno == "Rotativo":
             st.write(f"{dias_semana[i].capitalize()}: S/ {pagos[i]:.2f}")
         st.success(f"**Total semana {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_semana:.2f}**")
 
-    elif tipo_pago == "Quincenal":
-        st.markdown("### 📅 Cuadro quincenal")
-        year = 2025
-        mes_num = list(calendar.month_name).index(mes_pago)
-        pagos = []
-        st.write("**Día | Nombre | Pago diario**")
-        for dia in range(1, 16):
-            fecha = date(year, mes_num, dia)
-            nombre = nombre_dia(fecha)
-            if dia == 1:
-                pago = total_dia if turno_inicio_pago == "Día" else total_noche
-            elif nombre == "domingo":
-                pago = neto_dia if turno_inicio_pago == "Día" else neto_noche
-            else:
-                semana = (dia - 1) // 7
-                if semana % 2 == 0:
-                    pago = total_dia if turno_inicio_pago == "Día" else total_noche
-                else:
-                    pago = total_noche if turno_inicio_pago == "Día" else total_dia
-            pagos.append(pago)
-            st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
-        total_quincena = sum(pagos)
-        st.success(f"**Total quincena {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_quincena:.2f}**")
+
+                elif tipo_pago == "Quincenal":
+                    st.markdown("### 📅 Cuadro quincenal")
+                    year = 2025
+                    mes_num = list(calendar.month_name).index(mes_pago)
+                    pagos = []
+                    st.write("**Día | Nombre | Pago diario**")
+                    turno_actual = turno_inicio_pago
+                    for dia in range(1, 16):
+                        fecha = date(year, mes_num, dia)
+                        nombre = nombre_dia(fecha)
+
+                        if nombre == "domingo":
+                            fecha_sabado = fecha - timedelta(days=1)
+                            semana_index = (fecha_sabado.day - 1) // 7
+                            turno_sabado = turno_inicio_pago if semana_index % 2 == 0 else ("Día" if turno_inicio_pago == "Noche" else "Noche")
+                            pago = neto_dia if turno_sabado == "Día" else neto_noche
+                        else:
+                            semana_index = (dia - 1) // 7
+                            turno_actual = turno_inicio_pago if semana_index % 2 == 0 else ("Día" if turno_inicio_pago == "Noche" else "Noche")
+                            pago = total_dia if turno_actual == "Día" else total_noche
+
+                        pagos.append(pago)
+                        st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
+                    total_quincena = sum(pagos)
+                    st.success(f"**Total quincena {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_quincena:.2f}**")

@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 import calendar
+from datetime import date
 
 # Datos de AFP combinados
 afp_dict = {

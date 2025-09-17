@@ -12,10 +12,6 @@ afp_dict = {
     "PRIMA MIXTA": 0.1137,
     "PROFUTURO MIXTA": 0.1137,
     "ONP": 0.13,
-    "Prima": 0.1147,
-    "Integra": 0.1146,
-    "Profuturo": 0.1145,
-    "Habitat": 0.1149
 }
 
 # Función para calcular horas trabajadas descontando 45 minutos de refrigerio

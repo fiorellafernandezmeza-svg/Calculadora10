@@ -52,7 +52,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
 # Interfaz de usuario
         st.title("Calculadora de Sueldo por Turno")
 
-         tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
+                               tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
          turno = st.selectbox("Turno", ["Día", "Rotativo"])
          sueldo_base = st.number_input("Sueldo base", min_value=0.0)
          asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)

@@ -167,7 +167,7 @@ if turno == "Rotativo":
         st.success(f"**Total semana {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_semana:.2f}**")
 
 
-                elif tipo_pago == "Quincenal":
+                    elif tipo_pago == "Quincenal":
                     st.markdown("### 📅 Cuadro quincenal")
                     year = 2025
                     mes_num = list(calendar.month_name).index(mes_pago)

@@ -1,19 +1,6 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-# Datos de AFP combinados
-afp_dict = {
-    "HABITAT": 0.1284,
-    "INTEGRA": 0.1292,
-    "PRIMA": 0.1297,
-    "PROFUTURO": 0.1306,
-    "HABITAT MIXTA": 0.1137,
-    "INTEGRA MIXTA": 0.1137,
-    "PRIMA MIXTA": 0.1137,
-    "PROFUTURO MIXTA": 0.1137,
-    "ONP": 0.13,
-}
-
 # Función para calcular horas trabajadas descontando 45 minutos de refrigerio
 def calcular_horas_trabajadas(hora_ingreso, hora_salida):
     if hora_salida < hora_ingreso:
@@ -57,7 +44,21 @@ sueldo_base = st.number_input("Sueldo base", min_value=0.0)
 asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
 dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
 afp = st.selectbox("Tipo de AFP", ["Prima", "Integra", "Profuturo", "Habitat"])
-afp_descuentos = {"Prima": 0.1147, "Integra": 0.1146, "Profuturo": 0.1145, "Habitat": 0.1149}
+afp_descuentos = {
+    "HABITAT": 0.1284,
+    "INTEGRA": 0.1292,
+    "PRIMA": 0.1297,
+    "PROFUTURO": 0.1306,
+    "HABITAT MIXTA": 0.1137,
+    "INTEGRA MIXTA": 0.1137,
+    "PRIMA MIXTA": 0.1137,
+    "PROFUTURO MIXTA": 0.1137,
+    "ONP": 0.13,
+    "Prima": 0.1147,
+    "Integra": 0.1146,
+    "Profuturo": 0.1145,
+    "Habitat": 0.1149
+}
 afp_descuento = afp_descuentos[afp]
 
 if turno == "Día":

@@ -45,30 +45,3 @@ else:
 
 st.write(f"Tarifa hora extra al 25% (Día): S/ {tarifa_25:.2f}")
 st.write(f"Tarifa hora extra al 35% (Día): S/ {tarifa_35:.2f}")
-
-
-
-from datetime import datetime, timedelta
-
-# Ingreso de horas
-if turno == "Día":
-    hora_ingreso_dia = st.time_input("Hora de ingreso (Día)", value=datetime.strptime("08:00", "%H:%M").time())
-    hora_salida_dia = st.time_input("Hora de salida (Día)", value=datetime.strptime("17:00", "%H:%M").time())
-    horas_trabajadas_dia = (datetime.combine(datetime.today(), hora_salida_dia) - datetime.combine(datetime.today(), hora_ingreso_dia)).seconds / 3600
-else:
-    hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", value=datetime.strptime("08:00", "%H:%M").time())
-    hora_salida_dia = st.time_input("Hora de salida (Día - Rotativo)", value=datetime.strptime("17:00", "%H:%M").time())
-    hora_ingreso_noche = st.time_input("Hora de ingreso (Noche - Rotativo)", value=datetime.strptime("20:00", "%H:%M").time())
-    hora_salida_noche = st.time_input("Hora de salida (Noche - Rotativo)", value=datetime.strptime("05:00", "%H:%M").time())
-
-    horas_trabajadas_dia = (datetime.combine(datetime.today(), hora_salida_dia) - datetime.combine(datetime.today(), hora_ingreso_dia)).seconds / 3600
-    # Ajuste para turno nocturno que cruza medianoche
-    if hora_salida_noche < hora_ingreso_noche:
-        horas_trabajadas_noche = ((datetime.combine(datetime.today(), hora_salida_noche) + timedelta(days=1)) - datetime.combine(datetime.today(), hora_ingreso_noche)).seconds / 3600
-    else:
-        horas_trabajadas_noche = (datetime.combine(datetime.today(), hora_salida_noche) - datetime.combine(datetime.today(), hora_ingreso_noche)).seconds / 3600
-
-# Mostrar horas calculadas
-st.write(f"Horas trabajadas (Día): {horas_trabajadas_dia:.2f}")
-if turno == "Rotativo":
-    st.write(f"Horas trabajadas (Noche): {horas_trabajadas_noche:.2f}")

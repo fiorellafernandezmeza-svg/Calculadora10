@@ -1,6 +1,8 @@
-import calendar
+
 import streamlit as st
 from datetime import datetime, timedelta
+import calendar
+from datetime import date
 
 # Datos de AFP combinados
 afp_dict = {
@@ -131,3 +133,118 @@ elif turno == "Rotativo":
         st.write(f"Neto por horas extra 25%: S/ {neto25_noche:.2f}")
         st.write(f"Neto por horas extra 35%: S/ {neto35_noche:.2f}")
         st.success(f"Total turno noche: S/ {total_noche:.2f}")
+
+
+# Nuevas opciones de pago
+st.markdown("### 🗓️ Información de pago")
+tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal", "Mensual"])
+turno_inicio_pago = st.selectbox("Turno del primer día de pago", ["Día", "Noche"])
+mes_pago = st.selectbox("Mes de pago", [calendar.month_name[i] for i in range(1, 13)])
+
+# Función para obtener nombre del día
+
+# Función para construir quincena con corrección de domingo
+def construir_quincena(turno_inicio, tipo_pago, primer_turno_pago, mes_num, neto_dia_8h, neto_noche_8h, total_dia, total_noche):
+    quincena = []
+    for dia in range(1, 16):
+        fecha = date(2025, mes_num, dia)
+        nombre_dia = calendar.day_name[fecha.weekday()]
+        
+        if nombre_dia == "Sunday":
+            # Determinar el turno del sábado anterior
+            fecha_sabado = fecha - timedelta(days=1)
+            semana_index = (fecha_sabado.day - 1) // 7
+            turno_sabado = turno_inicio if semana_index % 2 == 0 else ("Noche" if turno_inicio == "Día" else "Día")
+            pago = neto_dia_8h if turno_sabado == "Día" else neto_noche_8h
+        else:
+            semana_index = (dia - 1) // 7
+            turno_actual = turno_inicio if semana_index % 2 == 0 else ("Noche" if turno_inicio == "Día" else "Día")
+            pago = total_dia if turno_actual == "Día" else total_noche
+        
+        quincena.append((dia, nombre_dia, round(pago, 2)))
+    return quincena
+
+
+# Función para construir mes completo con lógica de domingos
+def construir_mes(turno_inicio, primer_turno_pago, mes_num, neto_dia_8h, neto_noche_8h, total_dia, total_noche):
+    pagos_mes = []
+    dias_mes = calendar.monthrange(2025, mes_num)[1]
+    for dia in range(1, dias_mes + 1):
+        fecha = date(2025, mes_num, dia)
+        nombre_dia = calendar.day_name[fecha.weekday()]
+        
+        if nombre_dia == "Sunday":
+            # Determinar el turno del sábado anterior
+            fecha_sabado = fecha - timedelta(days=1)
+            semana_index = (fecha_sabado.day - 1) // 7
+            turno_sabado = turno_inicio if semana_index % 2 == 0 else ("Noche" if turno_inicio == "Día" else "Día")
+            pago = neto_dia_8h if turno_sabado == "Día" else neto_noche_8h
+        else:
+            semana_index = (dia - 1) // 7
+            turno_actual = turno_inicio if semana_index % 2 == 0 else ("Noche" if turno_inicio == "Día" else "Día")
+            pago = total_dia if turno_actual == "Día" else total_noche
+        
+        pagos_mes.append((dia, nombre_dia, round(pago, 2)))
+    return pagos_mes
+
+def nombre_dia(fecha):
+    dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    return dias[fecha.weekday()]
+
+# Mostrar cuadro según selección
+if turno == "Rotativo":
+    if tipo_pago == "Semanal":
+        st.markdown("### 📅 Cuadro semanal")
+        dias_semana = ["sábado", "domingo", "lunes", "martes", "miércoles", "jueves", "viernes"]
+        pagos = []
+        if turno_inicio_pago == "Día":
+            pagos.append(total_dia)  # sábado
+            pagos.append(neto_dia)   # domingo
+            pagos.extend([total_noche]*5)  # lunes a viernes
+            st.markdown("**Turno semanal (inicio Día):**")
+        else:
+            pagos.append(total_noche)  # sábado
+            pagos.append(neto_noche)   # domingo
+            pagos.extend([total_dia]*5)  # lunes a viernes
+            st.markdown("**Turno semanal (inicio Noche):**")
+        total_semana = sum(pagos)
+        for i in range(7):
+            st.write(f"{dias_semana[i].capitalize()}: S/ {pagos[i]:.2f}")
+        st.success(f"**Total semana {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_semana:.2f}**")
+
+    elif tipo_pago == "Quincenal":
+        st.markdown("### 📅 Cuadro quincenal")
+        year = 2025
+        mes_num = list(calendar.month_name).index(mes_pago)
+        pagos = []
+        st.write("**Día | Nombre | Pago diario**")
+        for dia in range(1, 16):
+            fecha = date(year, mes_num, dia)
+            nombre = nombre_dia(fecha)
+            if dia == 1:
+                pago = total_dia if turno_inicio_pago == "Día" else total_noche
+            elif nombre == "domingo":
+                pago = neto_dia if turno_inicio_pago == "Día" else neto_noche
+            else:
+                semana = (dia - 1) // 7
+                if semana % 2 == 0:
+                    pago = total_dia if turno_inicio_pago == "Día" else total_noche
+                else:
+                    pago = total_noche if turno_inicio_pago == "Día" else total_dia
+            pagos.append(pago)
+            st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
+        total_quincena = sum(pagos)
+        st.success(f"**Total quincena {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_quincena:.2f}**")
+
+elif tipo_pago == "Mensual":
+    st.markdown("### 📅 Cuadro mensual")
+    year = 2025
+    mes_num = list(calendar.month_name).index(mes_pago)
+    pagos_mes = construir_mes(turno, turno_inicio_pago, mes_num, neto_dia, neto_noche, total_dia, total_noche)
+    st.write("**Día | Nombre | Pago diario**")
+    total_mes = 0
+    for dia, nombre, pago in pagos_mes:
+        st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
+        total_mes += pago
+    st.success(f"**Total mensual: S/ {total_mes:.2f}**")
+

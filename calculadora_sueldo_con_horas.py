@@ -10,13 +10,15 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
 
 # Función para calcular tarifas
 def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
+    if tipo_trabajador == "Obrero" and turno == "Día":
+        tipo_trabajador = "Empleado"
     if turno == "Noche - Rotativo":
         sueldo_base = max(sueldo_base, 1525.50)
     base_diaria = (sueldo_base + asignacion_familiar) / dias_mes
     tarifa_hora = (base_diaria / 8) * (1 - afp_descuento)
     if turno == "Noche - Rotativo":
-        extra_25 = tarifa_hora * (1.25 if tipo_trabajador == "Empleado" or turno == "Día" else 1.40)
-        extra_35 = tarifa_hora * (1.35 if tipo_trabajador == "Empleado" or turno == "Día" else 1.50)
+        extra_25 = tarifa_hora * (1.25 if tipo_trabajador == "Empleado" else 1.40)
+        extra_35 = tarifa_hora * (1.35 if tipo_trabajador == "Empleado" else 1.50)
     else:
         extra_25 = tarifa_hora * 1.25
         extra_35 = tarifa_hora * 1.35

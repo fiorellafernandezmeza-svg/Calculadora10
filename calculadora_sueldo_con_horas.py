@@ -39,15 +39,15 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                         return tarifa_hora, extra_25, extra_35
 
 # Función para calcular netos
-        def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
-                                h_ordinarias = min(horas, 8)
-                                h_extra_25 = min(max(horas - 8, 0), 2)
-                                h_extra_35 = max(horas - 10, 0)
-                                neto_ordinario = h_ordinarias * tarifa_hora
-                                neto_25 = h_extra_25 * tarifa_25
-                                neto_35 = h_extra_35 * tarifa_35
-                                total = neto_ordinario + neto_25 + neto_35
-                                return neto_ordinario, neto_25, neto_35, total
+                        def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
+                            h_ordinarias = min(horas, 8)
+                            h_extra_25 = min(max(horas - 8, 0), 2)
+                            h_extra_35 = max(horas - 10, 0)
+                            neto_ordinario = h_ordinarias * tarifa_hora
+                            neto_25 = h_extra_25 * tarifa_25
+                            neto_35 = h_extra_35 * tarifa_35
+                            total = neto_ordinario + neto_25 + neto_35
+                            return neto_ordinario, neto_25, neto_35, total
 
 # Interfaz de usuario
         st.title("Calculadora de Sueldo por Turno")
@@ -61,10 +61,10 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
         afp_descuento = afp_dict[afp]
 
         if turno == "Día":
-                st.subheader("Turno Día")
-                col1, col2, col3 = st.columns(3)
+            st.subheader("Turno Día")
+            col1, col2, col3 = st.columns(3)
                 with col1:
-                                        hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", value=datetime.strptime("08:00", "%H:%M").time())
+                    hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", value=datetime.strptime("08:00", "%H:%M").time())
                                         with col2:
                                             hora_salida_dia = st.time_input("Hora de salida (Día - Rotativo)", value=datetime.strptime("17:00", "%H:%M").time())
                                             with col3:
@@ -87,8 +87,8 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                     col_dia, col_noche = st.columns(2)
 
                                                         with col_dia:
-                                                        st.subheader("Turno Día (Rotativo)")
-                                                        c1, c2, c3 = st.columns(3)
+                                                    st.subheader("Turno Día (Rotativo)")
+                                                    c1, c2, c3 = st.columns(3)
                                                         with c1:
                                                             hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", key="ingreso_dia", value=datetime.strptime("08:00", "%H:%M").time())
                                                             with c2:
@@ -155,11 +155,11 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                                                                     pagos.append(neto_dia)   # domingo
                                                                                                     pagos.extend([total_noche]*5)  # lunes a viernes
                                                                                                     st.markdown("**Turno semanal (inicio Día):**")
-                                                                                                        pagos.append(total_noche)  # sábado
-                                                                                                        pagos.append(neto_noche)   # domingo
-                                                                                                        pagos.extend([total_dia]*5)  # lunes a viernes
-                                                                                                        st.markdown("**Turno semanal (inicio Noche):**")
-                                                                                                        total_semana = sum(pagos)
+                                                                                                    pagos.append(total_noche)  # sábado
+                                                                                                    pagos.append(neto_noche)   # domingo
+                                                                                                    pagos.extend([total_dia]*5)  # lunes a viernes
+                                                                                                    st.markdown("**Turno semanal (inicio Noche):**")
+                                                                                                    total_semana = sum(pagos)
                                                                                                         for i in range(7):
                                                                                                             st.write(f"{dias_semana[i].capitalize()}: S/ {pagos[i]:.2f}")
                                                                                                             st.success(f"**Total semana {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_semana:.2f}**")

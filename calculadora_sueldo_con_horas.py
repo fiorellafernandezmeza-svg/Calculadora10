@@ -39,7 +39,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                         return tarifa_hora, extra_25, extra_35
 
 # Función para calcular netos
-                            def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
+        def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
                                 h_ordinarias = min(horas, 8)
                                 h_extra_25 = min(max(horas - 8, 0), 2)
                                 h_extra_35 = max(horas - 10, 0)
@@ -50,7 +50,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                 return neto_ordinario, neto_25, neto_35, total
 
 # Interfaz de usuario
-                                st.title("Calculadora de Sueldo por Turno")
+        st.title("Calculadora de Sueldo por Turno")
 
                                 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
                                 turno = st.selectbox("Turno", ["Día", "Rotativo"])

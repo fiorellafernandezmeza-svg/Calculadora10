@@ -158,7 +158,7 @@ if turno == "Rotativo":
         else:
             pagos.append(total_noche)  # sábado
             pagos.append(neto_noche)   # domingo
-            pagos.extend([total_noche]*5)  # lunes a viernes
+            pagos.extend([total_dia]*5)  # lunes a viernes
             st.markdown("**Turno semanal (inicio Noche):**")
         total_semana = sum(pagos)
         for i in range(7):

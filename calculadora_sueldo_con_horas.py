@@ -18,14 +18,14 @@ afp_dict = {
 
 # Función para calcular horas trabajadas descontando 45 minutos de refrigerio
 def calcular_horas_trabajadas(hora_ingreso, hora_salida):
-    if hora_salida < hora_ingreso:
-        hora_salida += timedelta(days=1)
-    horas_trabajadas = (hora_salida - hora_ingreso).total_seconds() / 3600 - 0.75
-    return max(horas_trabajadas, 0)
-    
+if hora_salida < hora_ingreso:
+hora_salida += timedelta(days=1)
+horas_trabajadas = (hora_salida - hora_ingreso).total_seconds() / 3600 - 0.75
+return max(horas_trabajadas, 0)
+
 # Función para calcular tarifas
-def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, 
-tipo_trabajador, turno):
+def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
+if tipo_trabajador == "Obrero" and turno == "Día":
 tipo_trabajador = "Empleado"
 if turno == "Noche - Rotativo":
 sueldo_base = max(sueldo_base, 1525.50)

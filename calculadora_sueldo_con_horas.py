@@ -24,8 +24,8 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
     return max(horas_trabajadas, 0)
     
 # Función para calcular tarifas
-def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
-if tipo_trabajador == "Obrero" and turno == "Día":
+def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, 
+tipo_trabajador, turno):
 tipo_trabajador = "Empleado"
 if turno == "Noche - Rotativo":
 sueldo_base = max(sueldo_base, 1525.50)

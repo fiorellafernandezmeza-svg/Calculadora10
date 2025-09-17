@@ -52,13 +52,13 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
 # Interfaz de usuario
         st.title("Calculadora de Sueldo por Turno")
 
-                               tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
-         turno = st.selectbox("Turno", ["Día", "Rotativo"])
-         sueldo_base = st.number_input("Sueldo base", min_value=0.0)
-         asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
-         dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
-         afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
-         afp_descuento = afp_dict[afp]
+        tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
+        turno = st.selectbox("Turno", ["Día", "Rotativo"])
+        sueldo_base = st.number_input("Sueldo base", min_value=0.0)
+        asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
+        dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
+        afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
+        afp_descuento = afp_dict[afp]
 
                                 if turno == "Día":
                                     st.subheader("Turno Día")

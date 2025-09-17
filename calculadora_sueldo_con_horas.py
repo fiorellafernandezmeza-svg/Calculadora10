@@ -60,7 +60,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
         afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
         afp_descuento = afp_dict[afp]
 
-            if turno == "Día":
+        if turno == "Día":
                 st.subheader("Turno Día")
                 col1, col2, col3 = st.columns(3)
                                     with col1:

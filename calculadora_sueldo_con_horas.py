@@ -83,7 +83,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                 st.write(f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
                 st.success(f"Total turno día: S/ {total_dia:.2f}")
 
-                    elif turno == "Rotativo":
+                elif turno == "Rotativo":
                         col_dia, col_noche = st.columns(2)
 
                                                         with col_dia:

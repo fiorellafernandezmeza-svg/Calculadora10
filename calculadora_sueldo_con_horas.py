@@ -64,7 +64,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
             st.subheader("Turno Día")
             col1, col2, col3 = st.columns(3)
             with col1:
-                    hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", value=datetime.strptime("08:00", "%H:%M").time())
+                hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", value=datetime.strptime("08:00", "%H:%M").time())
                                         with col2:
                                             hora_salida_dia = st.time_input("Hora de salida (Día - Rotativo)", value=datetime.strptime("17:00", "%H:%M").time())
                                             with col3:

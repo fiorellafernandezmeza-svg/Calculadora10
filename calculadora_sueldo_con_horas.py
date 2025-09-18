@@ -23,7 +23,7 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
         horas_trabajadas = (hora_salida - hora_ingreso).total_seconds() / 3600 - 0.75
         return max(horas_trabajadas, 0)
 
-# Función para calcular tarifas
+        # Función para calcular tarifas
         def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
             if tipo_trabajador == "Obrero" and turno == "Día":
                 tipo_trabajador = "Empleado"
@@ -38,27 +38,27 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                         extra_35 = tarifa_hora * 1.35
                         return tarifa_hora, extra_25, extra_35
 
-# Función para calcular netos
-                        def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
-                            h_ordinarias = min(horas, 8)
-                            h_extra_25 = min(max(horas - 8, 0), 2)
-                            h_extra_35 = max(horas - 10, 0)
-                            neto_ordinario = h_ordinarias * tarifa_hora
-                            neto_25 = h_extra_25 * tarifa_25
-                            neto_35 = h_extra_35 * tarifa_35
-                            total = neto_ordinario + neto_25 + neto_35
-                            return neto_ordinario, neto_25, neto_35, total
+                        # Función para calcular netos
+        def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
+            h_ordinarias = min(horas, 8)
+            h_extra_25 = min(max(horas - 8, 0), 2)
+            h_extra_35 = max(horas - 10, 0)
+            neto_ordinario = h_ordinarias * tarifa_hora
+            neto_25 = h_extra_25 * tarifa_25
+            neto_35 = h_extra_35 * tarifa_35
+            total = neto_ordinario + neto_25 + neto_35
+            return neto_ordinario, neto_25, neto_35, total
 
-# Interfaz de usuario
-        st.title("Calculadora de Sueldo por Turno")
+            # Interfaz de usuario
+            st.title("Calculadora de Sueldo por Turno")
 
-        tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
-        turno = st.selectbox("Turno", ["Día", "Rotativo"])
-        sueldo_base = st.number_input("Sueldo base", min_value=0.0)
-        asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
-        dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
-        afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
-        afp_descuento = afp_dict[afp]
+            tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
+            turno = st.selectbox("Turno", ["Día", "Rotativo"])
+            sueldo_base = st.number_input("Sueldo base", min_value=0.0)
+            asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
+            dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
+            afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
+            afp_descuento = afp_dict[afp]
 
         if turno == "Día":
             st.subheader("Turno Día")
@@ -87,8 +87,8 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                     col_dia, col_noche = st.columns(2)
 
                                                         with col_dia:
-                                                    st.subheader("Turno Día (Rotativo)")
-                                                    c1, c2, c3 = st.columns(3)
+                                                            st.subheader("Turno Día (Rotativo)")
+                                                            c1, c2, c3 = st.columns(3)
                                                         with c1:
                                                             hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", key="ingreso_dia", value=datetime.strptime("08:00", "%H:%M").time())
                                                             with c2:
@@ -133,18 +133,18 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                                                     st.success(f"Total turno noche: S/ {total_noche:.2f}")
 
 
-# Nuevas opciones de pago
+                                                                                    # Nuevas opciones de pago
                                                                                     st.markdown("### 🗓️ Información de pago")
                                                                                     tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal", "Mensual"])
                                                                                     turno_inicio_pago = st.selectbox("Turno del primer día de pago", ["Día", "Noche"])
                                                                                     mes_pago = st.selectbox("Mes de pago", [calendar.month_name[i] for i in range(1, 13)])
 
-# Función para obtener nombre del día
+                                                                                    # Función para obtener nombre del día
                                                                                     def nombre_dia(fecha):
                                                                                         dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
                                                                                         return dias[fecha.weekday()]
 
-# Mostrar cuadro según selección
+                                                                                        # Mostrar cuadro según selección
                                                                                         if turno == "Rotativo":
                                                                                             if tipo_pago == "Semanal":
                                                                                                 st.markdown("### 📅 Cuadro semanal")
@@ -189,3 +189,4 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                                                                                                                         st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
                                                                                                                         total_quincena = sum(pagos)
                                                                                                                         st.success(f"**Total quincena {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_quincena:.2f}**")
+

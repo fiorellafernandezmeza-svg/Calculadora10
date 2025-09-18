@@ -75,16 +75,16 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                 tarifa_dia, extra25_dia, extra35_dia = calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Día")
                 neto_dia, neto25_dia, neto35_dia, total_dia = calcular_netos(horas_dia, tarifa_dia, extra25_dia, extra35_dia)
 
-                                                st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
-                                                st.write(f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
-                                                st.write(f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
-                                                st.write(f"Neto por 8 horas: S/ {neto_dia:.2f}")
-                                                st.write(f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
-                                                st.write(f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
-                                                st.success(f"Total turno día: S/ {total_dia:.2f}")
+                st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
+                st.write(f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
+                st.write(f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
+                st.write(f"Neto por 8 horas: S/ {neto_dia:.2f}")
+                st.write(f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
+                st.write(f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
+                st.success(f"Total turno día: S/ {total_dia:.2f}")
 
-                                                elif turno == "Rotativo":
-                                                    col_dia, col_noche = st.columns(2)
+                    elif turno == "Rotativo":
+                        col_dia, col_noche = st.columns(2)
 
                                                         with col_dia:
                                                             st.subheader("Turno Día (Rotativo)")

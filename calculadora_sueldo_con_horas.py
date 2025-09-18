@@ -67,13 +67,13 @@ def calcular_horas_trabajadas(hora_ingreso, hora_salida):
                 hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", value=datetime.strptime("08:00", "%H:%M").time())
             with col2:
                 hora_salida_dia = st.time_input("Hora de salida (Día - Rotativo)", value=datetime.strptime("17:00", "%H:%M").time())
-                                            with col3:
-                                                horas_dia = calcular_horas_trabajadas(datetime.combine(datetime.today(), hora_ingreso_dia),
-                                                datetime.combine(datetime.today(), hora_salida_dia))
-                                                st.metric("Horas trabajadas (Día)", f"{horas_dia:.2f}")
+            with col3:
+                horas_dia = calcular_horas_trabajadas(datetime.combine(datetime.today(), hora_ingreso_dia),
+                datetime.combine(datetime.today(), hora_salida_dia))
+                st.metric("Horas trabajadas (Día)", f"{horas_dia:.2f}")
 
-                                                tarifa_dia, extra25_dia, extra35_dia = calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Día")
-                                                neto_dia, neto25_dia, neto35_dia, total_dia = calcular_netos(horas_dia, tarifa_dia, extra25_dia, extra35_dia)
+                tarifa_dia, extra25_dia, extra35_dia = calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Día")
+                neto_dia, neto25_dia, neto35_dia, total_dia = calcular_netos(horas_dia, tarifa_dia, extra25_dia, extra35_dia)
 
                                                 st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
                                                 st.write(f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")

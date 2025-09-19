@@ -191,8 +191,15 @@ elif turno == "Rotativo":
             # Detecta el lunes para cambio de turno (excepto el primer día)
             if nombre == "lunes" and dia != 1:
                 turno_semana = "Noche" if turno_semana == "Día" else "Día"
-            # El domingo hereda el turno del sábado anterior
-            pago = total_dia if turno_semana == "Día" else total_noche
+            # El domingo asigna el neto por 8 horas según el turno del sábado anterior
+            if nombre == "domingo":
+                if turno_semana == "Día":
+                    pago = neto_dia
+                else:
+                    pago = neto_noche
+            else:
+                pago = total_dia if turno_semana == "Día" else total_noche
+
             pagos.append(pago)
             st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
         total_quincena = sum(pagos)

@@ -183,19 +183,16 @@ elif turno == "Rotativo":
         mes_num = list(calendar.month_name).index(mes_pago)
         pagos = []
         st.write("**Día | Nombre | Pago diario**")
-        turno_actual = turno_inicio_pago
+        turno_semana = turno_inicio_pago
+
         for dia in range(1, 16):
             fecha = date(year, mes_num, dia)
             nombre = nombre_dia(fecha)
-            if nombre == "domingo":
-                fecha_sabado = fecha - timedelta(days=1)
-                semana_index = (fecha_sabado.day - 1) // 7
-                turno_sabado = turno_inicio_pago if semana_index % 2 == 0 else ("Día" if turno_inicio_pago == "Noche" else "Noche")
-                pago = neto_dia if turno_sabado == "Día" else neto_noche
-            else:
-                semana_index = (dia - 1) // 7
-                turno_actual = turno_inicio_pago if semana_index % 2 == 0 else ("Día" if turno_inicio_pago == "Noche" else "Noche")
-                pago = total_dia if turno_actual == "Día" else total_noche
+            # Detecta el lunes para cambio de turno (excepto el primer día)
+            if nombre == "lunes" and dia != 1:
+                turno_semana = "Noche" if turno_semana == "Día" else "Día"
+            # El domingo hereda el turno del sábado anterior
+            pago = total_dia if turno_semana == "Día" else total_noche
             pagos.append(pago)
             st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
         total_quincena = sum(pagos)

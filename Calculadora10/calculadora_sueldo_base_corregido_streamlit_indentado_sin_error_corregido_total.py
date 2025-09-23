@@ -225,4 +225,4 @@ elif turno == "Rotativo":
         st.markdown(f"**Total del mes:** S/ {total_mes:.2f}")
 
     elif tipo_pago == "Quincenal":
-        # ... (lógica quincenal previa, si se requiere modificar avísame)
+        # (lógica quincenal previa, si se requiere modificar avísame)

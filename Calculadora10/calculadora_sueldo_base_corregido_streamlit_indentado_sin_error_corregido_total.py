@@ -2,6 +2,7 @@ import streamlit as st
 from datetime import datetime, timedelta
 import calendar
 from datetime import date
+import pandas as pd
 
 # Datos de AFP combinados
 afp_dict = {
@@ -159,48 +160,69 @@ elif turno == "Rotativo":
 
     # Mostrar cuadro según selección
     if tipo_pago == "Semanal":
-        st.markdown("### 📅 Cuadro semanal")
-        dias_semana = ["sábado", "domingo", "lunes", "martes", "miércoles", "jueves", "viernes"]
-        pagos = []
-        if turno_inicio_pago == "Día":
-            pagos.append(total_dia)  # sábado
-            pagos.append(neto_dia)   # domingo
-            pagos.extend([total_noche]*5)  # lunes a viernes
-            st.markdown("**Turno semanal (inicio Día):**")
-        else:
-            pagos.append(total_noche)  # sábado
-            pagos.append(neto_noche)   # domingo
-            pagos.extend([total_dia]*5)  # lunes a viernes
-            st.markdown("**Turno semanal (inicio Noche):**")
-        total_semana = sum(pagos)
-        for i in range(7):
-            st.write(f"{dias_semana[i].capitalize()}: S/ {pagos[i]:.2f}")
-        st.success(f"**Total semana {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_semana:.2f}**")
-
-    elif tipo_pago == "Quincenal":
-        st.markdown("### 📅 Cuadro quincenal")
+        st.markdown("### 📅 Cuadro semanal detallado por mes")
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
-        pagos = []
-        st.write("**Día | Nombre | Pago diario**")
-        turno_semana = turno_inicio_pago
+        ultimo_dia_mes = calendar.monthrange(year, mes_num)[1]
 
-        for dia in range(1, 16):
+        pagos_semanas = []
+        tabla = []
+        total_mes = 0
+        turno_semana = turno_inicio_pago
+        index_semana = 1
+        total_semana = 0
+
+        for dia in range(1, ultimo_dia_mes + 1):
             fecha = date(year, mes_num, dia)
             nombre = nombre_dia(fecha)
-            # Detecta el lunes para cambio de turno (excepto el primer día)
-            if nombre == "lunes" and dia != 1:
-                turno_semana = "Noche" if turno_semana == "Día" else "Día"
-            # El domingo asigna el neto por 8 horas según el turno del sábado anterior
+            # Si es sábado y no es el primer día, inicia nueva semana y alterna turno si rotativo
+            if nombre == "sábado" and dia != 1:
+                tabla[-1]["Total Semana"] = f"S/ {total_semana:.2f}"
+                pagos_semanas.append(total_semana)
+                total_mes += total_semana
+                total_semana = 0
+                index_semana += 1
+                if turno == "Rotativo":
+                    turno_semana = "Noche" if turno_semana == "Día" else "Día"
+
+            # El domingo asigna el neto por 8 horas según el turno del sábado anterior, resto de días toma el total según turno semanal
             if nombre == "domingo":
-                if turno_semana == "Día":
-                    pago = neto_dia
-                else:
-                    pago = neto_noche
+                pago = neto_dia if turno_semana == "Día" else neto_noche
             else:
                 pago = total_dia if turno_semana == "Día" else total_noche
 
-            pagos.append(pago)
-            st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
-        total_quincena = sum(pagos)
-        st.success(f"**Total quincena {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_quincena:.2f}**")
+            fila = {
+                "Semana": index_semana,
+                "Día": dia,
+                "Fecha": fecha.strftime('%d/%m/%Y'),
+                "Nombre Día": nombre.capitalize(),
+                "Turno": turno_semana,
+                "Pago Diario": f"S/ {pago:.2f}",
+                "Total Semana": ""
+            }
+            tabla.append(fila)
+            total_semana += pago
+
+        # Guardar el total de la última semana
+        tabla[-1]["Total Semana"] = f"S/ {total_semana:.2f}"
+        pagos_semanas.append(total_semana)
+        total_mes += total_semana
+
+        # Mostrar tabla
+        df = pd.DataFrame(tabla)
+        st.dataframe(df, use_container_width=True)
+
+        # Mostrar totales
+        st.success(f"**Total del mes: S/ {total_mes:.2f}**")
+
+        # Resumen semanal
+        resumen = pd.DataFrame({
+            "Semana": [i+1 for i in range(len(pagos_semanas))],
+            "Total Semana": [f"S/ {v:.2f}" for v in pagos_semanas]
+        })
+        st.markdown("#### Resumen semanal")
+        st.dataframe(resumen, use_container_width=True)
+        st.markdown(f"**Total del mes:** S/ {total_mes:.2f}")
+
+    elif tipo_pago == "Quincenal":
+        # ... (lógica quincenal previa, si se requiere modificar avísame)

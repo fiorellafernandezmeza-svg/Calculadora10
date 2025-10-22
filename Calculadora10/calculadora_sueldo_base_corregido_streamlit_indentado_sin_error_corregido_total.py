@@ -27,8 +27,8 @@ def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, 
     if turno == "Noche - Rotativo":
         sueldo_base = max(sueldo_base, 1525.50)
     
-    def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
-    # Ajustes especiales por tipo de trabajador y turno
+def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
+# Ajustes especiales por tipo de trabajador y turno
     if tipo_trabajador == "Obrero" and turno == "Día":
         tipo_trabajador = "Empleado"
     if turno == "Noche - Rotativo":

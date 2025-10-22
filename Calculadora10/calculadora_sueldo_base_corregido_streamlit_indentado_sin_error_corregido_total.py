@@ -260,56 +260,10 @@ elif turno == "Rotativo":
         total_mes = sum(pagos)
         st.markdown("---")
         st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
-        
-        year = 2025
-        mes_num = list(calendar.month_name).index(mes_pago)
-        dias_mes = calendar.monthrange(year, mes_num)[1]
-        
-        # Función para obtener nombre del día
-        def nombre_dia(fecha):
-            dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-            return dias[fecha.weekday()]
-            
-        pagos = []
-        turno_semana = turno_inicio_pago
-        pago_semana = 0
-        dias_semana = []
-        
-        st.write("**Día | Nombre | Turno | Pago diario**")
-        for dia in range(1, dias_mes + 1):
-            fecha = date(year, mes_num, dia)
-            nombre = nombre_dia(fecha)
-            
-            # Cambiar turno cada lunes (excepto el primer día)
-            if nombre == "lunes" and dia != 1:
-               turno_semana = "Noche" if turno_semana == "Día" else "Día"
+------------------------------    
+    elif tipo_pago == "Quincenal":
+        st.markdown("### 📅 Cuadro quincenal")
 
-            # Pago diario
-            if nombre == "domingo":
-                pago = neto_dia if turno_semana == "Día" else neto_noche
-            else:
-                pago = total_dia if turno_semana == "Día" else total_noche
-
-            pagos.append(pago)
-            dias_semana.append((dia, nombre, turno_semana, pago))
-            pago_semana += pago
-
-            # Si llega viernes o es el último día del mes → mostrar resumen semanal
-            if nombre == "viernes" or dia == dias_mes:
-                st.markdown("---")
-                st.markdown(f"**Semana que termina el viernes {dia:02d} de {mes_pago}:**")
-                for d, n, t, p in dias_semana:
-                    st.write(f"{d:02d} | {n.capitalize()} | {t} | S/ {p:.2f}")
-                st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
-                # Reiniciar acumuladores
-                pago_semana = 0
-                dias_semana = []
-
-        # Total mensual general
-        total_mes = sum(pagos)
-        st.markdown("---")
-        st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
-    
     elif tipo_pago == "Quincenal":
         st.markdown("### 📅 Cuadro quincenal")
         year = 2025
@@ -321,19 +275,26 @@ elif turno == "Rotativo":
         for dia in range(1, 16):
             fecha = date(year, mes_num, dia)
             nombre = nombre_dia(fecha)
-            # Detecta el lunes para cambio de turno (excepto el primer día)
+
+            # 🔁 Cambio de turno cada lunes (excepto el primer día)
             if nombre == "lunes" and dia != 1:
                 turno_semana = "Noche" if turno_semana == "Día" else "Día"
-            # El domingo asigna el neto por 8 horas según el turno del sábado anterior
-            if nombre == "domingo":
-                if turno_semana == "Día":
-                    pago = neto_dia
-                else:
-                    pago = neto_noche
+
+            # 💰 Si es feriado: pago fijo día
+            if es_feriado(fecha):
+                pago = neto_dia
+                feriado_flag = "🟥"
+            else:
+                # Domingo paga neto de 8h según turno anterior
+                if nombre == "domingo":
+                    pago = neto_dia if turno_semana == "Día" else neto_noche
+                    feriado_flag = ""
             else:
                 pago = total_dia if turno_semana == "Día" else total_noche
+                feriado_flag = ""
 
             pagos.append(pago)
-            st.write(f"{dia:02d} | {nombre.capitalize()} | S/ {pago:.2f}")
+            st.write(f"{dia:02d} | {nombre.capitalize()} {feriado_flag} | S/ {pago:.2f}")
+
         total_quincena = sum(pagos)
-        st.success(f"**Total quincena {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_quincena:.2f}**")
+        st.success(f"**Total quincena ({'día' if turno_inicio_pago == 'Día' else 'noche'}): S/ {total_quincena:.2f}**")

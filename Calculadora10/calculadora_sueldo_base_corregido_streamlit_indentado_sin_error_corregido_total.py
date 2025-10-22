@@ -98,7 +98,7 @@ def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
     return neto_ordinario, neto_25, neto_35, total
 
 # Interfaz de usuario
-st.title("Calculadora de Sueldo por Turno")
+st.title("Calculadora de Sueldo por Turno 2025")
 
 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
 turno = st.selectbox("Turno", ["Día", "Rotativo"])
@@ -186,11 +186,11 @@ elif turno == "Rotativo":
             horas_noche, tarifa_noche, extra25_noche, extra35_noche
         )
         st.write(f"Tarifa hora ordinaria: S/ {tarifa_noche:.2f}")
-        st.write(f"Tarifa hora extra 25%: S/ {extra25_noche:.2f}")
-        st.write(f"Tarifa hora extra 35%: S/ {extra35_noche:.2f}")
-        st.write(f"Neto por 8 horas: S/ {neto_noche:.2f}")
-        st.write(f"Neto por horas extra 25%: S/ {neto25_noche:.2f}")
-        st.write(f"Neto por horas extra 35%: S/ {neto35_noche:.2f}")
+        (f"Tarifa hora extra 25%: S/ {extra25_noche:.2f}")
+        (f"Tarifa hora extra 35%: S/ {extra35_noche:.2f}")
+        st.success(f"Neto por 8 horas: S/ {neto_noche:.2f}")
+        (f"Neto por horas extra 25%: S/ {neto25_noche:.2f}")
+        (f"Neto por horas extra 35%: S/ {neto35_noche:.2f}")
         st.success(f"Total turno noche: S/ {total_noche:.2f}")
 
     # Nuevas opciones de pago
@@ -245,7 +245,7 @@ elif turno == "Rotativo":
 
             # 📅 Cierre semanal cada viernes o fin de mes
             if nombre == "viernes" or dia == dias_mes:
-                st.markdown("---")
+             
                 st.markdown(f"**Semana que termina el viernes {dia:02d} de {mes_pago}:**")
                 for d, n, t, p, f in dias_semana:
                     st.write(f"{d:02d} | {n.capitalize()} | {t} | {f} S/ {p:.2f}")

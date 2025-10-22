@@ -205,9 +205,6 @@ elif turno == "Rotativo":
         return dias[fecha.weekday()]
 
     # Mostrar cuadro según selección
-
-    if tipo_pago == "Semanal":
-        st.markdown("### 📅 Cuadro semanal (mes completo)")
         
     if tipo_pago == "Semanal":
         st.markdown("### 📅 Cuadro semanal (mes completo)")
@@ -263,9 +260,7 @@ elif turno == "Rotativo":
 
     elif tipo_pago == "Quincenal":
         st.markdown("### 📅 Cuadro quincenal")
-
-    elif tipo_pago == "Quincenal":
-        st.markdown("### 📅 Cuadro quincenal")
+        
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
         pagos = []

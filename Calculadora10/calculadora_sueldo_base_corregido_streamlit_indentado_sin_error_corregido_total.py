@@ -98,7 +98,7 @@ def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
     return neto_ordinario, neto_25, neto_35, total
 
 # Interfaz de usuario
-st.title("Calculadora de Sueldo por Turno 2025")
+st.title("Calculadora de Sueldo por Turno")
 
 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
 turno = st.selectbox("Turno", ["Día", "Rotativo"])
@@ -129,7 +129,7 @@ if turno == "Día":
         horas_dia, tarifa_dia, extra25_dia, extra35_dia
     )
     st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
-    (f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
+    _ = f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}"
     (f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
     st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
     (f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
@@ -143,9 +143,9 @@ elif turno == "Rotativo":
         st.subheader("Turno Día (Rotativo)")
         c1, c2, c3 = st.columns(3)
         with c1:
-            hora_ingreso_dia = st.time_input("Hora de ingreso (Día - Rotativo)", key="ingreso_dia", value=datetime.strptime("08:00", "%H:%M").time())
+            hora_ingreso_dia = st.time_input("Hora de ingreso", key="ingreso_dia", value=datetime.strptime("08:00", "%H:%M").time())
         with c2:
-            hora_salida_dia = st.time_input("Hora de salida (Día - Rotativo)", key="salida_dia", value=datetime.strptime("17:00", "%H:%M").time())
+            hora_salida_dia = st.time_input("Hora de salida", key="salida_dia", value=datetime.strptime("17:00", "%H:%M").time())
         with c3:
             horas_dia = calcular_horas_trabajadas(
                 datetime.combine(datetime.today(), hora_ingreso_dia),

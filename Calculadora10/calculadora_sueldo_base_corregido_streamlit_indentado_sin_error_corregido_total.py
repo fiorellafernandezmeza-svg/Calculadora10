@@ -129,11 +129,11 @@ if turno == "Día":
         horas_dia, tarifa_dia, extra25_dia, extra35_dia
     )
     st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
-    st.write(f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
-    st.write(f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
-    st.write(f"Neto por 8 horas: S/ {neto_dia:.2f}")
-    st.write(f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
-    st.write(f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
+    (f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
+    (f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
+    st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
+    (f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
+    (f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
     st.success(f"Total turno día: S/ {total_dia:.2f}")
 
 elif turno == "Rotativo":
@@ -159,11 +159,11 @@ elif turno == "Rotativo":
             horas_dia, tarifa_dia, extra25_dia, extra35_dia
         )
         st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
-        st.write(f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
-        st.write(f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
-        st.write(f"Neto por 8 horas: S/ {neto_dia:.2f}")
-        st.write(f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
-        st.write(f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
+        (f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
+        (f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
+        st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
+        (f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
+        (f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
         st.success(f"Total turno día: S/ {total_dia:.2f}")
 
     with col_noche:

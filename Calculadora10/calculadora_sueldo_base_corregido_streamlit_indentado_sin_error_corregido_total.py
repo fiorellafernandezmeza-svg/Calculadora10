@@ -289,9 +289,9 @@ elif turno == "Rotativo":
                 if nombre == "domingo":
                     pago = neto_dia if turno_semana == "Día" else neto_noche
                     feriado_flag = ""
-            else:
-                pago = total_dia if turno_semana == "Día" else total_noche
-                feriado_flag = ""
+                else:
+                    pago = total_dia if turno_semana == "Día" else total_noche
+                    feriado_flag = ""
 
             pagos.append(pago)
             st.write(f"{dia:02d} | {nombre.capitalize()} {feriado_flag} | S/ {pago:.2f}")

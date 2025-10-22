@@ -207,7 +207,7 @@ elif turno == "Rotativo":
     # Mostrar cuadro según selección
         
     if tipo_pago == "Semanal":
-        st.markdown("### 📅 Cuadro semanal (mes completo)")
+        st.markdown("### 📅 Calculo semanal (mes completo)")
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
         dias_mes = calendar.monthrange(year, mes_num)[1]
@@ -259,7 +259,7 @@ elif turno == "Rotativo":
         st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
 
     elif tipo_pago == "Quincenal":
-        st.markdown("### 📅 Cálculo mensual (con quincenas)")
+        st.markdown("### 📅 Cálculo quincenal (mes completo)")
 
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
@@ -309,4 +309,4 @@ elif turno == "Rotativo":
 
         # 🔸 Total general del mes
         total_mes = total_quincena_1 + total_quincena_2
-        st.info(f"💰 **Total del mes completo: S/ {total_mes:.2f}**")
+        st.info(f"💰 **Total mes completo: S/ {total_mes:.2f}**")

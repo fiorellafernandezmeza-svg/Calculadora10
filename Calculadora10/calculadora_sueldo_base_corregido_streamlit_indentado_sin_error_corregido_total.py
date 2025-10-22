@@ -5,14 +5,11 @@ from datetime import date
 
 # Datos de AFP combinados
 afp_dict = {
-    "HABITAT": 0.1284,
-    "INTEGRA": 0.1292,
-    "PRIMA": 0.1297,
-    "PROFUTURO": 0.1306,
-    "HABITAT MIXTA": 0.1137,
-    "INTEGRA MIXTA": 0.1137,
-    "PRIMA MIXTA": 0.1137,
-    "PROFUTURO MIXTA": 0.1137,
+    "HABITAT FLUJO": 0.1284,
+    "INTEGRA FLUJO": 0.1292,
+    "PRIMA FLUJO": 0.1297,
+    "PROFUTURO FLUJO": 0.1306,
+    "AFP MIXTA": 0.1137,
     "ONP": 0.13,
 }
 
@@ -56,7 +53,7 @@ st.title("Calculadora de Sueldo por Turno")
 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
 turno = st.selectbox("Turno", ["Día", "Rotativo"])
 sueldo_base = st.number_input("Sueldo base", min_value=0.0)
-asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
+asignacion_familiar = st.number_input("Asignación familiar", min_value=113.0)
 dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
 afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
 afp_descuento = afp_dict[afp]
@@ -159,24 +156,56 @@ elif turno == "Rotativo":
 
     # Mostrar cuadro según selección
     if tipo_pago == "Semanal":
-        st.markdown("### 📅 Cuadro semanal")
-        dias_semana = ["sábado", "domingo", "lunes", "martes", "miércoles", "jueves", "viernes"]
+        st.markdown("### 📅 Cuadro semanal (mes completo)")
+        year = 2025
+        mes_num = list(calendar.month_name).index(mes_pago)
+        dias_mes = calendar.monthrange(year, mes_num)[1]
+        
+        # Función para obtener nombre del día
+        def nombre_dia(fecha):
+            dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+            return dias[fecha.weekday()]
+            
         pagos = []
-        if turno_inicio_pago == "Día":
-            pagos.append(total_dia)  # sábado
-            pagos.append(neto_dia)   # domingo
-            pagos.extend([total_noche]*5)  # lunes a viernes
-            st.markdown("**Turno semanal (inicio Día):**")
-        else:
-            pagos.append(total_noche)  # sábado
-            pagos.append(neto_noche)   # domingo
-            pagos.extend([total_dia]*5)  # lunes a viernes
-            st.markdown("**Turno semanal (inicio Noche):**")
-        total_semana = sum(pagos)
-        for i in range(7):
-            st.write(f"{dias_semana[i].capitalize()}: S/ {pagos[i]:.2f}")
-        st.success(f"**Total semana {'día' if turno_inicio_pago == 'Día' else 'noche'}: S/ {total_semana:.2f}**")
+        turno_semana = turno_inicio_pago
+        pago_semana = 0
+        dias_semana = []
+        
+        st.write("**Día | Nombre | Turno | Pago diario**")
+        for dia in range(1, dias_mes + 1):
+            fecha = date(year, mes_num, dia)
+            nombre = nombre_dia(fecha)
+            
+            # Cambiar turno cada lunes (excepto el primer día)
+            if nombre == "lunes" and dia != 1:
+               turno_semana = "Noche" if turno_semana == "Día" else "Día"
 
+            # Pago diario
+            if nombre == "domingo":
+                pago = neto_dia if turno_semana == "Día" else neto_noche
+            else:
+                pago = total_dia if turno_semana == "Día" else total_noche
+
+            pagos.append(pago)
+            dias_semana.append((dia, nombre, turno_semana, pago))
+            pago_semana += pago
+
+            # Si llega viernes o es el último día del mes → mostrar resumen semanal
+            if nombre == "viernes" or dia == dias_mes:
+                st.markdown("---")
+                st.markdown(f"**Semana que termina el viernes {dia:02d} de {mes_pago}:**")
+                for d, n, t, p in dias_semana:
+                    st.write(f"{d:02d} | {n.capitalize()} | {t} | S/ {p:.2f}")
+                st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
+                # Reiniciar acumuladores
+                pago_semana = 0
+                dias_semana = []
+
+        # Total mensual general
+        total_mes = sum(pagos)
+        st.markdown("---")
+        st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
+    
     elif tipo_pago == "Quincenal":
         st.markdown("### 📅 Cuadro quincenal")
         year = 2025

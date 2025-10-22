@@ -130,10 +130,10 @@ if turno == "Día":
     )
     st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
     _ = f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}"
-    (f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
+    _ = f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}"
     st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
-    (f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
-    (f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
+    _ = f"Neto por horas extra 25%: S/ {neto25_dia:.2f}"
+    _ = f"Neto por horas extra 35%: S/ {neto35_dia:.2f}"
     st.success(f"Total turno día: S/ {total_dia:.2f}")
 
 elif turno == "Rotativo":
@@ -159,20 +159,20 @@ elif turno == "Rotativo":
             horas_dia, tarifa_dia, extra25_dia, extra35_dia
         )
         st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
-        (f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}")
-        (f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}")
+        _ = f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}"
+        _ = f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}"
         st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
-        (f"Neto por horas extra 25%: S/ {neto25_dia:.2f}")
-        (f"Neto por horas extra 35%: S/ {neto35_dia:.2f}")
+        _ = f"Neto por horas extra 35%: S/ {neto35_dia:.2f}"
+        _ = f"Neto por horas extra 35%: S/ {neto35_dia:.2f}"
         st.success(f"Total turno día: S/ {total_dia:.2f}")
 
     with col_noche:
         st.subheader("Turno Noche (Rotativo)")
         c1, c2, c3 = st.columns(3)
         with c1:
-            hora_ingreso_noche = st.time_input("Hora de ingreso (Noche - Rotativo)", key="ingreso_noche", value=datetime.strptime("22:00", "%H:%M").time())
+            hora_ingreso_noche = st.time_input("Hora de ingreso", key="ingreso_noche", value=datetime.strptime("22:00", "%H:%M").time())
         with c2:
-            hora_salida_noche = st.time_input("Hora de salida (Noche - Rotativo)", key="salida_noche", value=datetime.strptime("07:00", "%H:%M").time())
+            hora_salida_noche = st.time_input("Hora de salida", key="salida_noche", value=datetime.strptime("07:00", "%H:%M").time())
         with c3:
             horas_noche = calcular_horas_trabajadas(
                 datetime.combine(datetime.today(), hora_ingreso_noche),
@@ -186,11 +186,11 @@ elif turno == "Rotativo":
             horas_noche, tarifa_noche, extra25_noche, extra35_noche
         )
         st.write(f"Tarifa hora ordinaria: S/ {tarifa_noche:.2f}")
-        (f"Tarifa hora extra 25%: S/ {extra25_noche:.2f}")
-        (f"Tarifa hora extra 35%: S/ {extra35_noche:.2f}")
+        _ = f"Tarifa hora extra 25%: S/ {extra25_noche:.2f}"
+        _ = f"Tarifa hora extra 35%: S/ {extra35_noche:.2f}"
         st.success(f"Neto por 8 horas: S/ {neto_noche:.2f}")
-        (f"Neto por horas extra 25%: S/ {neto25_noche:.2f}")
-        (f"Neto por horas extra 35%: S/ {neto35_noche:.2f}")
+        _ = f"Neto por horas extra 25%: S/ {neto25_noche:.2f}"
+        _ = f"Neto por horas extra 35%: S/ {neto35_noche:.2f}"
         st.success(f"Total turno noche: S/ {total_noche:.2f}")
 
     # Nuevas opciones de pago

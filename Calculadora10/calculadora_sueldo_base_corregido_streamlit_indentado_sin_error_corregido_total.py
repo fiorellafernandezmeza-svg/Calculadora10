@@ -3,6 +3,32 @@ from datetime import datetime, timedelta
 import calendar
 from datetime import date
 
+# --- 🔹 Feriados oficiales Perú 2025 ---
+FERIADOS_PERU_2025 = [
+    "2025-01-01",  # Año Nuevo
+    "2025-03-03",  # Lunes de Carnaval
+    "2025-03-04",  # Martes de Carnaval
+    "2025-04-17",  # Jueves Santo
+    "2025-04-18",  # Viernes Santo
+    "2025-05-01",  # Día del Trabajo
+    "2025-06-07",  # Nuevo
+    "2025-06-29",  # San Pedro y San Pablo
+    "2025-07-23",  # Nuevo
+    "2025-07-28",  # Independencia del Perú
+    "2025-07-29",  # Fiestas Patrias
+    "2025-08-06",  # Nuevo
+    "2025-08-30",  # Santa Rosa de Lima
+    "2025-10-08",  # Combate de Angamos
+    "2025-11-01",  # Todos los Santos
+    "2025-12-08",  # Inmaculada Concepción
+    "2025-12-09",  # Batalla de Ayacucho
+    "2025-12-25",  # Navidad
+]
+
+def es_feriado(fecha):
+    """Verifica si una fecha es feriado en Perú."""
+    return fecha.strftime("%Y-%m-%d") in FERIADOS_PERU_2025
+
 # Datos de AFP combinados
 afp_dict = {
     "HABITAT FLUJO": 0.1284,
@@ -179,8 +205,62 @@ elif turno == "Rotativo":
         return dias[fecha.weekday()]
 
     # Mostrar cuadro según selección
+
     if tipo_pago == "Semanal":
         st.markdown("### 📅 Cuadro semanal (mes completo)")
+        
+    if tipo_pago == "Semanal":
+        st.markdown("### 📅 Cuadro semanal (mes completo)")
+        year = 2025
+        mes_num = list(calendar.month_name).index(mes_pago)
+        dias_mes = calendar.monthrange(year, mes_num)[1]
+        
+        pagos = []
+        turno_semana = turno_inicio_pago
+        pago_semana = 0
+        dias_semana = []
+        
+        st.write("**Día | Nombre | Turno | Pago diario**")
+        
+        for dia in range(1, dias_mes + 1):
+            fecha = date(year, mes_num, dia)
+            nombre = nombre_dia(fecha)
+
+            # 🔁 Cambio de turno cada lunes (excepto el primer día)
+            if nombre == "lunes" and dia != 1:
+                turno_semana = "Noche" if turno_semana == "Día" else "Día"
+
+            # 💰 Cálculo del pago diario
+            if es_feriado(fecha):
+                pago = neto_dia  # feriado se paga como día neto (8 horas turno día)
+                feriado_flag = "🟥"
+            else:
+                if nombre == "domingo":
+                    pago = neto_dia if turno_semana == "Día" else neto_noche
+                    feriado_flag = ""
+                else:
+                    pago = total_dia if turno_semana == "Día" else total_noche
+                    feriado_flag = ""
+
+            pagos.append(pago)
+            dias_semana.append((dia, nombre, turno_semana, pago, feriado_flag))
+            pago_semana += pago
+
+            # 📅 Cierre semanal cada viernes o fin de mes
+            if nombre == "viernes" or dia == dias_mes:
+                st.markdown("---")
+                st.markdown(f"**Semana que termina el viernes {dia:02d} de {mes_pago}:**")
+                for d, n, t, p, f in dias_semana:
+                    st.write(f"{d:02d} | {n.capitalize()} | {t} | {f} S/ {p:.2f}")
+                st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
+
+                pago_semana = 0
+                dias_semana = []
+
+        total_mes = sum(pagos)
+        st.markdown("---")
+        st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
+        
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
         dias_mes = calendar.monthrange(year, mes_num)[1]

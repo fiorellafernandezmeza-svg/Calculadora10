@@ -26,8 +26,32 @@ def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, 
         tipo_trabajador = "Empleado"
     if turno == "Noche - Rotativo":
         sueldo_base = max(sueldo_base, 1525.50)
-    base_diaria = (sueldo_base + asignacion_familiar) / dias_mes
-    tarifa_hora = (base_diaria / 8) * (1 - afp_descuento)
+    
+    def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
+    # Ajustes especiales por tipo de trabajador y turno
+    if tipo_trabajador == "Obrero" and turno == "Día":
+        tipo_trabajador = "Empleado"
+    if turno == "Noche - Rotativo":
+        sueldo_base = max(sueldo_base, 1525.50)
+    
+    # --- 1️⃣ Cálculo de tarifa ordinaria (igual que antes) ---
+    base_diaria_ordinaria = (sueldo_base + asignacion_familiar) / dias_mes
+    tarifa_hora = (base_diaria_ordinaria / 8) * (1 - afp_descuento)
+
+    # --- 2️⃣ Cálculo de base para horas extra (siempre sobre 30 días) ---
+    base_diaria_extra = (sueldo_base + asignacion_familiar) / 30
+    tarifa_base_extra = (base_diaria_extra / 8) * (1 - afp_descuento)
+
+    # --- 3️⃣ Cálculo de tarifas de horas extra ---
+    if turno == "Noche - Rotativo":
+        extra_25 = tarifa_base_extra * (1.25 if tipo_trabajador == "Empleado" else 1.40)
+        extra_35 = tarifa_base_extra * (1.35 if tipo_trabajador == "Empleado" else 1.50)
+    else:
+        extra_25 = tarifa_base_extra * 1.25
+        extra_35 = tarifa_base_extra * 1.35
+
+    return tarifa_hora, extra_25, extra_35
+
     if turno == "Noche - Rotativo":
         extra_25 = tarifa_hora * (1.25 if tipo_trabajador == "Empleado" else 1.40)
         extra_35 = tarifa_hora * (1.35 if tipo_trabajador == "Empleado" else 1.50)

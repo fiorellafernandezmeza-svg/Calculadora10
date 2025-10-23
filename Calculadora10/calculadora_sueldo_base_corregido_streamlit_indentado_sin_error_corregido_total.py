@@ -141,9 +141,9 @@ if tipo_trabajador == "Empleado":
     """)
 
 # --- 🧱 Si no es empleado, se ejecuta la parte de obreros (turnos y cálculo por día) ---
-elif tipo_trabajador == "Obrero":
+ elif tipo_trabajador == "Obrero":
 
-if turno == "Día":
+ if turno == "Día":
     st.subheader("Turno Día")
     col1, col2, col3 = st.columns(3)
     with col1:

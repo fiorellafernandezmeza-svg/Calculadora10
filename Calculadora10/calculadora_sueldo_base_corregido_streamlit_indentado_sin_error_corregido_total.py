@@ -113,6 +113,36 @@ dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
 afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
 afp_descuento = afp_dict[afp]
 
+# --- 💼 Cálculo directo para Empleado ---
+if tipo_trabajador == "Empleado":
+    st.markdown("### 👔 Cálculo de Pago Mensual - Empleado")
+
+    # Ingreso bruto (básico + asignación familiar si aplica)
+    ingreso_bruto = sueldo_base + asignacion_familiar
+    st.write(f"**Ingreso bruto mensual:** S/ {ingreso_bruto:.2f}")
+
+    # Tipo de aporte: AFP u ONP
+    tipo_aporte = "AFP" if afp != "ONP" else "ONP"
+    porcentaje_descuento = afp_descuento  # Usa el descuento seleccionado del combo
+
+    # Cálculo del descuento previsional
+    descuento = ingreso_bruto * porcentaje_descuento
+    st.write(f"**Descuento {tipo_aporte}:** S/ {descuento:.2f}")
+
+    # Pago neto
+    pago_neto = ingreso_bruto - descuento
+    st.success(f"💰 **Pago neto del mes:** S/ {pago_neto:.2f}")
+
+    # Información adicional
+    st.markdown("""
+    > 🔹 Este cálculo considera una jornada completa de 8 horas diarias.  
+    > 🔹 No incluye descuentos de 5ta categoría, préstamos, comedor ni otros.  
+    > 🔹 Solo se aplica el descuento de AFP u ONP según el tipo seleccionado.
+    """)
+
+# --- 🧱 Si no es empleado, se ejecuta la parte de obreros (turnos y cálculo por día) ---
+elif tipo_trabajador == "Obrero":
+
 if turno == "Día":
     st.subheader("Turno Día")
     col1, col2, col3 = st.columns(3)

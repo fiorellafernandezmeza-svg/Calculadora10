@@ -100,6 +100,12 @@ def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
 # Interfaz de usuario
 st.title("Calculadora de Sueldo por Turno")
 
+st.warning("""
+⚠️ **Importante:**  
+El cálculo mostrado es solo una guía. No considera descuentos de 5ta categoría, préstamos, comedor ni otros.  
+Incluye únicamente el descuento de AFP u ONP.
+""")
+
 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
 turno = st.selectbox("Turno", ["Día", "Rotativo"])
 sueldo_base = st.number_input("Sueldo base", min_value=0.0)

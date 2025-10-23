@@ -102,7 +102,7 @@ st.title("Calculadora de Sueldo por Turno")
 
 st.warning("""
 ⚠️ **Importante:**  
-El cálculo mostrado es solo una guía. No considera descuentos de 5ta categoría, préstamos, comedor ni otros.  
+El cálculo mostrado es solo una guía. No considera descuentos de 5ta categoría, préstamos, aportes de comedor ni otros.  
 Incluye únicamente el descuento de AFP u ONP.
 """)
 

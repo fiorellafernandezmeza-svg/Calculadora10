@@ -333,5 +333,5 @@ elif turno == "Rotativo":
         st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
 
     elif tipo_pago == "Quincenal":
-        st.markdown("###
+    st.markdown("###
 

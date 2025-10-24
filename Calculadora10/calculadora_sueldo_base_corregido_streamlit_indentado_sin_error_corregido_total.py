@@ -99,11 +99,12 @@ def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
     return neto_ordinario, neto_25, neto_35, total
 
 # Interfaz de usuario
-st.title("Calculadora de Sueldo por Turno")
+st.title("Calculadora de Sueldo")
 
 st.warning("""
 ⚠️ **Importante:**  
-El cálculo mostrado es solo una guía. No considera descuentos de 5ta categoría, préstamos, aportes de comedor ni otros. **Incluye únicamente el descuento de AFP u ONP.**
+El cálculo mostrado es solo una guía. 
+**Incluye únicamente el descuento de AFP u ONP.** No considera otros descuentos. 
 """)
 
 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
@@ -137,7 +138,7 @@ if tipo_trabajador == "Empleado":
     # Información adicional
     st.markdown("""
     > 🔹 Este cálculo considera una jornada completa de 8 horas diarias.  
-    > 🔹 No incluye descuentos de 5ta categoría, préstamos, comedor ni otros.  
+    > 🔹 No incluye descuentos de 5ta categoría, préstamos, aportes de comedor ni otros.  
     > 🔹 Solo se aplica el descuento de AFP u ONP según el tipo seleccionado.
     """)
 # --- 🧱 Si no es empleado, se ejecuta la parte de obreros (turnos y cálculo por día) ---
@@ -446,4 +447,11 @@ elif tipo_trabajador == "Obrero":
             # 🔸 Total general del mes
             total_mes = total_quincena_1 + total_quincena_2
             st.info(f"💰 **Total mes completo: S/ {total_mes:.2f}**")
+
+            # Información adicional
+            st.markdown("""
+            > 🔹 Este cálculo considera una jornada con horas extras, segun el horario seleccionado.  
+            > 🔹 No incluye descuentos de 5ta categoría, préstamos, aportes de comedor ni otros.  
+            > 🔹 Solo se aplica el descuento de AFP u ONP según el tipo seleccionado.
+            """)
 

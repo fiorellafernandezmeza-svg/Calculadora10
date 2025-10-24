@@ -229,107 +229,127 @@ elif tipo_trabajador == "Obrero":
 
     # --- 🔹 Turno Rotativo ---
     elif turno == "Rotativo":
-        st.subheader("Turno Rotativo (Noche o Día Alternado)")
+        st.subheader("Turno Rotativo (Día y Noche Alternado)")
 
-        col1, col2, col3 = st.columns(3)
+        # 🕘 Configuración de horarios base
+        col1, col2 = st.columns(2)
         with col1:
-            hora_ingreso_rot = st.time_input("Hora de ingreso (Rotativo)", value=datetime.strptime("19:00", "%H:%M").time())
+            hora_ingreso_dia = st.time_input("Hora de ingreso (Día)", value=datetime.strptime("08:00", "%H:%M").time())
+            hora_salida_dia = st.time_input("Hora de salida (Día)", value=datetime.strptime("17:00", "%H:%M").time())
         with col2:
-            hora_salida_rot = st.time_input("Hora de salida (Rotativo)", value=datetime.strptime("07:00", "%H:%M").time())
-        with col3:
-            horas_rot = calcular_horas_trabajadas(
-                datetime.combine(datetime.today(), hora_ingreso_rot),
-                datetime.combine(datetime.today(), hora_salida_rot)
-            )
-            st.metric("Horas trabajadas (Rotativo)", f"{horas_rot:.2f}")
+            hora_ingreso_noche = st.time_input("Hora de ingreso (Noche)", value=datetime.strptime("19:00", "%H:%M").time())
+            hora_salida_noche = st.time_input("Hora de salida (Noche)", value=datetime.strptime("07:00", "%H:%M").time())
 
-        tarifa_rot, extra25_rot, extra35_rot = calcular_tarifas(
-            sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Noche - Rotativo"
+        # Cálculo de horas trabajadas
+        horas_dia = calcular_horas_trabajadas(
+            datetime.combine(datetime.today(), hora_ingreso_dia),
+            datetime.combine(datetime.today(), hora_salida_dia)
         )
-        neto_rot, neto25_rot, neto35_rot, total_rot = calcular_netos(horas_rot, tarifa_rot, extra25_rot, extra35_rot)
+        horas_noche = calcular_horas_trabajadas(
+            datetime.combine(datetime.today(), hora_ingreso_noche),
+            datetime.combine(datetime.today(), hora_salida_noche)
+        )
 
-        st.write(f"Tarifa hora ordinaria: S/ {tarifa_rot:.2f}")
-        st.write(f"Tarifa hora extra 25%: S/ {extra25_rot:.2f}")
-        st.write(f"Tarifa hora extra 35%: S/ {extra35_rot:.2f}")
-        st.success(f"Total turno rotativo: S/ {total_rot:.2f}")
+        # Tarifa y neto para ambos turnos
+        tarifa_dia, extra25_dia, extra35_dia = calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Día")
+        tarifa_noche, extra25_noche, extra35_noche = calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Noche - Rotativo")
 
-        # --- Información de pago ---
+        neto_dia, _, _, total_dia = calcular_netos(horas_dia, tarifa_dia, extra25_dia, extra35_dia)
+        neto_noche, _, _, total_noche = calcular_netos(horas_noche, tarifa_noche, extra25_noche, extra35_noche)
+
+        # Mostrar resumen por turno
+        st.markdown("#### 💡 Resumen de tarifas por turno")
+        st.write(f"**Tarifa hora día:** S/ {tarifa_dia:.2f} | **Total turno día:** S/ {total_dia:.2f}")
+        st.write(f"**Tarifa hora noche:** S/ {tarifa_noche:.2f} | **Total turno noche:** S/ {total_noche:.2f}")
+
+        # --- Selección de pago y mes ---
         st.markdown("### 🗓️ Información de pago")
         tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal"])
         mes_pago = st.selectbox("Mes de pago", [calendar.month_name[i] for i in range(1, 13)])
+        turno_inicio_pago = st.selectbox("Turno del primer día del mes", ["Día", "Noche"])
 
+        # Variables de cálculo
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
         dias_mes = calendar.monthrange(year, mes_num)[1]
+        pagos = []
+        pago_acumulado = 0
+        dias_periodo = []
+        turno_actual = turno_inicio_pago
 
-        # --- Cálculo semanal ---
+        def nombre_dia(fecha):
+            dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+            return dias[fecha.weekday()]
+
+        # --- Cálculo Semanal o Quincenal ---
         if tipo_pago == "Semanal":
             st.markdown("### 📅 Cuadro semanal (Turno Rotativo)")
-            pagos = []
-            pago_semana = 0
-            dias_semana = []
-
             for dia in range(1, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
 
+                # Cambia de turno cada lunes (día/noche)
+                if nombre == "lunes" and dia != 1:
+                    turno_actual = "Noche" if turno_actual == "Día" else "Día"
+
+                # Cálculo del pago
                 if es_feriado(fecha) or nombre == "domingo":
-                    pago = neto_rot
-                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                    pago = neto_dia  # feriado o domingo se paga como día
+                    feriado_flag = "🟥"
                 else:
-                    pago = total_rot
+                    pago = total_dia if turno_actual == "Día" else total_noche
                     feriado_flag = ""
 
                 pagos.append(pago)
-                dias_semana.append((dia, nombre, pago, feriado_flag))
-                pago_semana += pago
+                dias_periodo.append((dia, nombre, turno_actual, pago, feriado_flag))
+                pago_acumulado += pago
 
                 if nombre == "viernes" or dia == dias_mes:
                     st.markdown(f"**Semana que termina el viernes {dia:02d}:**")
-                    for d, n, p, f in dias_semana:
-                        st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
-                    st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
-                    pago_semana = 0
-                    dias_semana = []
+                    for d, n, t, p, f in dias_periodo:
+                        st.write(f"{d:02d} | {n.capitalize()} ({t}) {f} | S/ {p:.2f}")
+                    st.success(f"**Total semana: S/ {pago_acumulado:.2f}**")
+                    pago_acumulado = 0
+                    dias_periodo = []
 
             total_mes = sum(pagos)
             st.markdown("---")
             st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
 
-        # --- Cálculo quincenal ---
         elif tipo_pago == "Quincenal":
             st.markdown("### 📅 Cuadro quincenal (Turno Rotativo)")
-            pagos = []
-            pago_quincena = 0
-            dias_quincena = []
-
             for dia in range(1, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
 
+                # Cambia de turno cada lunes
+                if nombre == "lunes" and dia != 1:
+                    turno_actual = "Noche" if turno_actual == "Día" else "Día"
+
+                # Pago del día
                 if es_feriado(fecha) or nombre == "domingo":
-                    pago = neto_rot
-                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                    pago = neto_dia
+                    feriado_flag = "🟥"
                 else:
-                    pago = total_rot
+                    pago = total_dia if turno_actual == "Día" else total_noche
                     feriado_flag = ""
 
                 pagos.append(pago)
-                dias_quincena.append((dia, nombre, pago, feriado_flag))
-                pago_quincena += pago
+                dias_periodo.append((dia, nombre, turno_actual, pago, feriado_flag))
+                pago_acumulado += pago
 
                 if dia in [15, dias_mes]:
                     st.markdown(f"**Quincena hasta el día {dia:02d}:**")
-                    for d, n, p, f in dias_quincena:
-                        st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
-                    st.success(f"**Total quincena: S/ {pago_quincena:.2f}**")
-                    pago_quincena = 0
-                    dias_quincena = []
+                    for d, n, t, p, f in dias_periodo:
+                        st.write(f"{d:02d} | {n.capitalize()} ({t}) {f} | S/ {p:.2f}")
+                    st.success(f"**Total quincena: S/ {pago_acumulado:.2f}**")
+                    pago_acumulado = 0
+                    dias_periodo = []
 
             total_mes = sum(pagos)
             st.markdown("---")
             st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
-
+            
 # --- 🔹 Nota final ---
 st.info("""
 📘 **Resumen general:**  

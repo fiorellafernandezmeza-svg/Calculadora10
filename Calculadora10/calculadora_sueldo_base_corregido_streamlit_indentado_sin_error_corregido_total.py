@@ -120,7 +120,7 @@ if tipo_trabajador == "Empleado":
     > 🔹 Solo se aplica el descuento de AFP u ONP según el tipo seleccionado.
     """)
 
-# --- 🧱 Parte Obrero ---
+# --- 🧱 Si no es empleado, se ejecuta la parte de obreros (turnos y cálculo por día) ---
 elif tipo_trabajador == "Obrero":
     if turno == "Día":
         st.subheader("Turno Día")
@@ -135,6 +135,7 @@ elif tipo_trabajador == "Obrero":
                 datetime.combine(datetime.today(), hora_salida_dia)
             )
         st.metric("Horas trabajadas (Día)", f"{horas_dia:.2f}")
+
         tarifa_dia, extra25_dia, extra35_dia = calcular_tarifas(
             sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Día"
         )
@@ -142,14 +143,19 @@ elif tipo_trabajador == "Obrero":
             horas_dia, tarifa_dia, extra25_dia, extra35_dia
         )
         st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
+        _ = f"Tarifa hora extra 25%: S/ {extra25_dia:.2f}"
+        _ = f"Tarifa hora extra 35%: S/ {extra35_dia:.2f}"
         st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
+        _ = f"Neto por horas extra 25%: S/ {neto25_dia:.2f}"
+        _ = f"Neto por horas extra 35%: S/ {neto35_dia:.2f}"
         st.success(f"Total turno día: S/ {total_dia:.2f}")
 
-        # Información de pago
+        # --- 📆 Nueva sección de información de pago para turno Día ---
         st.markdown("### 🗓️ Información de pago")
         tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal"])
         mes_pago = st.selectbox("Mes de pago", [calendar.month_name[i] for i in range(1, 13)])
 
+        # Función auxiliar para nombre del día
         def nombre_dia(fecha):
             dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
             return dias[fecha.weekday()]
@@ -158,6 +164,7 @@ elif tipo_trabajador == "Obrero":
         mes_num = list(calendar.month_name).index(mes_pago)
         dias_mes = calendar.monthrange(year, mes_num)[1]
 
+        # --- 🔹 Cálculo semanal ---
         if tipo_pago == "Semanal":
             st.markdown("### 📅 Cuadro semanal (Turno Día)")
             pagos = []
@@ -167,21 +174,26 @@ elif tipo_trabajador == "Obrero":
             for dia in range(1, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
+
+                # Determinar pago diario
                 if es_feriado(fecha) or nombre == "domingo":
-                    pago = neto_dia
+                    pago = neto_dia  # Pago por 8 horas turno día
                     feriado_flag = "🟥" if es_feriado(fecha) else ""
                 else:
                     pago = total_dia
                     feriado_flag = ""
+
                 pagos.append(pago)
                 dias_semana.append((dia, nombre, pago, feriado_flag))
                 pago_semana += pago
 
+                # Cierre de semana (viernes o fin de mes)
                 if nombre == "viernes" or dia == dias_mes:
                     st.markdown(f"**Semana que termina el viernes {dia:02d} de {mes_pago}:**")
                     for d, n, p, f in dias_semana:
                         st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
                     st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
+
                     pago_semana = 0
                     dias_semana = []
 
@@ -189,20 +201,34 @@ elif tipo_trabajador == "Obrero":
             st.markdown("---")
             st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
 
+        # --- 🔹 Cálculo quincenal ---
         elif tipo_pago == "Quincenal":
             st.markdown("### 📅 Cuadro quincenal (Turno Día)")
             pagos = []
             st.write("**Día | Nombre | Pago diario**")
+            turno_semana = turno_inicio_pago if 'turno_inicio_pago' in locals() else "Día"
 
             for dia in range(1, 16):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
-                if es_feriado(fecha) or nombre == "domingo":
+                # Detecta el lunes para cambio de turno (excepto el primer día)
+                if nombre == "lunes" and dia != 1:
+                    turno_semana = "Noche" if turno_semana == "Día" else "Día"
+                # El domingo asigna el neto por 8 horas según el turno del sábado anterior
+                if es_feriado(fecha):
                     pago = neto_dia
-                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                    feriado_flag = "🟥"
                 else:
-                    pago = total_dia
-                    feriado_flag = ""
+                    if nombre == "domingo":
+                        if turno_semana == "Día":
+                            pago = neto_dia
+                        else:
+                            pago = neto_noche if 'neto_noche' in locals() else neto_dia
+                        feriado_flag = ""
+                    else:
+                        pago = total_dia if turno_semana == "Día" else (total_noche if 'total_noche' in locals() else total_dia)
+                        feriado_flag = ""
+
                 pagos.append(pago)
                 st.write(f"{dia:02d} | {nombre.capitalize()} {feriado_flag} | S/ {pago:.2f}")
 
@@ -216,12 +242,23 @@ elif tipo_trabajador == "Obrero":
             for dia in range(16, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
-                if es_feriado(fecha) or nombre == "domingo":
+                # Detecta el lunes para cambio de turno (excepto el primer día)
+                if nombre == "lunes" and dia != 1:
+                    turno_semana = "Noche" if turno_semana == "Día" else "Día"
+                if es_feriado(fecha):
                     pago = neto_dia
-                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                    feriado_flag = "🟥"
                 else:
-                    pago = total_dia
-                    feriado_flag = ""
+                    if nombre == "domingo":
+                        if turno_semana == "Día":
+                            pago = neto_dia
+                        else:
+                            pago = neto_noche if 'neto_noche' in locals() else neto_dia
+                        feriado_flag = ""
+                    else:
+                        pago = total_dia if turno_semana == "Día" else (total_noche if 'total_noche' in locals() else total_dia)
+                        feriado_flag = ""
+
                 pagos2.append(pago)
                 st.write(f"{dia:02d} | {nombre.capitalize()} {feriado_flag} | S/ {pago:.2f}")
 
@@ -302,11 +339,13 @@ elif turno == "Rotativo":
             fecha = date(year, mes_num, dia)
             nombre = nombre_dia(fecha)
 
+            # 🔁 Cambio de turno cada lunes (excepto el primer día)
             if nombre == "lunes" and dia != 1:
                 turno_semana = "Noche" if turno_semana == "Día" else "Día"
 
+            # 💰 Cálculo del pago diario
             if es_feriado(fecha):
-                pago = neto_dia
+                pago = neto_dia  # feriado se paga como día neto (8 horas turno día)
                 feriado_flag = "🟥"
             else:
                 if nombre == "domingo":
@@ -320,6 +359,7 @@ elif turno == "Rotativo":
             dias_semana.append((dia, nombre, turno_semana, pago, feriado_flag))
             pago_semana += pago
 
+            # 📅 Cierre semanal cada viernes o fin de mes
             if nombre == "viernes" or dia == dias_mes:
                 st.markdown(f"**Semana que termina el viernes {dia:02d} de {mes_pago}:**")
                 for d, n, t, p, f in dias_semana:
@@ -333,4 +373,52 @@ elif turno == "Rotativo":
         st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
 
     elif tipo_pago == "Quincenal":
+        st.markdown("### 📅 Cálculo quincenal (mes completo)")
+        year = 2025
+        mes_num = list(calendar.month_name).index(mes_pago)
+        dias_en_mes = calendar.monthrange(year, mes_num)[1]
+        pagos = []
+        st.write("**Día | Nombre | Pago diario**")
+        turno_semana = turno_inicio_pago
+        total_quincena_1 = 0
+        total_quincena_2 = 0
+
+        for dia in range(1, dias_en_mes + 1):
+            fecha = date(year, mes_num, dia)
+            nombre = nombre_dia(fecha)
+
+            # 🔁 Cambio de turno cada lunes (excepto el primer día)
+            if nombre == "lunes" and dia != 1:
+                turno_semana = "Noche" if turno_semana == "Día" else "Día"
+
+            # 💰 Feriado: pago fijo día
+            if es_feriado(fecha):
+                pago = neto_dia
+                feriado_flag = "🟥"
+            else:
+                # Domingo paga neto según turno actual
+                if nombre == "domingo":
+                    pago = neto_dia if turno_semana == "Día" else neto_noche
+                    feriado_flag = ""
+                else:
+                    pago = total_dia if turno_semana == "Día" else total_noche
+                    feriado_flag = ""
+
+            pagos.append(pago)
+            st.write(f"{dia:02d} | {nombre.capitalize()} {feriado_flag} | S/ {pago:.2f}")
+
+            # 🔹 Suma automática al final de cada quincena
+            if dia == 15:
+                total_quincena_1 = sum(pagos)
+                st.success(f"**🟦 Total primera quincena: S/ {total_quincena_1:.2f}**")
+                st.markdown("---")
+
+            if dia == dias_en_mes:
+                total_quincena_2 = sum(pagos[15:])  # del 16 en adelante
+                st.success(f"**🟩 Total segunda quincena: S/ {total_quincena_2:.2f}**")
+                st.markdown("---")
+
+        # 🔸 Total general del mes
+        total_mes = total_quincena_1 + total_quincena_2
+        st.info(f"💰 **Total mes completo: S/ {total_mes:.2f}**")
 

@@ -28,7 +28,7 @@ def es_feriado(fecha):
     """Verifica si una fecha es feriado en Perú."""
     return fecha.strftime("%Y-%m-%d") in FERIADOS_PERU_2025
 
-# --- AFP y ONP ---
+# --- 🔹 Datos de AFP y ONP ---
 afp_dict = {
     "HABITAT FLUJO": 0.1284,
     "INTEGRA FLUJO": 0.1292,
@@ -38,30 +38,29 @@ afp_dict = {
     "ONP": 0.13,
 }
 
-# --- Cálculo de horas trabajadas ---
+# --- 🔹 Función para calcular horas trabajadas (resta 45 min de refrigerio) ---
 def calcular_horas_trabajadas(hora_ingreso, hora_salida):
     if hora_salida < hora_ingreso:
         hora_salida += timedelta(days=1)
     horas_trabajadas = (hora_salida - hora_ingreso).total_seconds() / 3600 - 0.75
     return max(horas_trabajadas, 0)
 
-# --- Función para calcular tarifas ---
+# --- 🔹 Función para calcular tarifas ---
 def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, turno):
-    # Ajustes especiales por tipo de trabajador y turno
     if tipo_trabajador == "Obrero" and turno == "Día":
         tipo_trabajador = "Empleado"
     if turno == "Noche - Rotativo":
         sueldo_base = max(sueldo_base, 1525.50)
 
-    # --- 1️⃣ Cálculo de tarifa ordinaria ---
+    # 1️⃣ Tarifa hora ordinaria (según días del mes)
     base_diaria_ordinaria = (sueldo_base + asignacion_familiar) / dias_mes
     tarifa_hora = (base_diaria_ordinaria / 8) * (1 - afp_descuento)
 
-    # --- 2️⃣ Cálculo de base para horas extra ---
+    # 2️⃣ Base para horas extra (siempre sobre 30 días)
     base_diaria_extra = (sueldo_base + asignacion_familiar) / 30
     tarifa_base_extra = (base_diaria_extra / 8) * (1 - afp_descuento)
 
-    # --- 3️⃣ Cálculo de tarifas de horas extra ---
+    # 3️⃣ Tarifas de horas extra
     if turno == "Noche - Rotativo":
         extra_25 = tarifa_base_extra * (1.25 if tipo_trabajador == "Empleado" else 1.40)
         extra_35 = tarifa_base_extra * (1.35 if tipo_trabajador == "Empleado" else 1.50)
@@ -71,37 +70,36 @@ def calcular_tarifas(sueldo_base, asignacion_familiar, dias_mes, afp_descuento, 
 
     return tarifa_hora, extra_25, extra_35
 
-# --- Cálculo de netos ---
+# --- 🔹 Función para calcular netos ---
 def calcular_netos(horas, tarifa_hora, tarifa_25, tarifa_35):
     h_ordinarias = min(horas, 8)
     h_extra_25 = min(max(horas - 8, 0), 2)
     h_extra_35 = max(horas - 10, 0)
+
     neto_ordinario = h_ordinarias * tarifa_hora
     neto_25 = h_extra_25 * tarifa_25
     neto_35 = h_extra_35 * tarifa_35
     total = neto_ordinario + neto_25 + neto_35
     return neto_ordinario, neto_25, neto_35, total
 
-# --- INTERFAZ PRINCIPAL ---
-st.title("💼 Calculadora de Sueldo por Turno")
+# --- 🔹 Interfaz principal ---
+st.title("Calculadora de Sueldo por Turno")
 
 st.warning("""
-⚠️ **Nota Importante:**
-Los cálculos mostrados son solo referenciales.
-No incluyen descuentos de 5ta categoría, préstamos, retenciones judiciales, comedor u otros.
-Solo se aplica el descuento de AFP u ONP según horario y turno.
+⚠️ **Importante:** Este cálculo no incluye descuentos de 5ta categoría, retenciones judiciales,
+comedor ni otros. Solo aplica el descuento de AFP u ONP según el tipo seleccionado.
 """)
 
-# --- Selección inicial ---
+# --- Entradas principales ---
 tipo_trabajador = st.selectbox("Tipo de trabajador", ["Empleado", "Obrero"])
 turno = st.selectbox("Turno", ["Día", "Rotativo"])
-sueldo_base = st.number_input("Sueldo base (S/)", min_value=0.0)
-asignacion_familiar = st.number_input("Asignación familiar (S/)", min_value=0.0)
+sueldo_base = st.number_input("Sueldo base", min_value=0.0)
+asignacion_familiar = st.number_input("Asignación familiar", min_value=0.0)
 dias_mes = st.number_input("Días del mes", min_value=1, max_value=31, value=30)
-afp = st.selectbox("Tipo de AFP", list(afp_dict.keys()))
+afp = st.selectbox("Tipo de AFP/ONP", list(afp_dict.keys()))
 afp_descuento = afp_dict[afp]
 
-# --- Cálculo para EMPLEADO ---
+# --- 💼 Cálculo directo para Empleado ---
 if tipo_trabajador == "Empleado":
     st.markdown("### 👔 Cálculo de Pago Mensual - Empleado")
 
@@ -116,37 +114,36 @@ if tipo_trabajador == "Empleado":
     st.success(f"💰 **Pago neto del mes:** S/ {pago_neto:.2f}")
 
     st.markdown("""
-    > 🔹 Cálculo basado en jornada completa de 8 horas diarias.  
-    > 🔹 No considera descuentos adicionales ni beneficios extras.
+    > 🔹 Este cálculo considera 8 horas diarias.  
+    > 🔹 No incluye descuentos adicionales.  
+    > 🔹 Solo aplica AFP u ONP según corresponda.
     """)
 
-# --- Cálculo para OBRERO ---
+# --- 🧱 Cálculo para Obrero ---
 elif tipo_trabajador == "Obrero":
 
     if turno == "Día":
-        st.subheader("☀️ Turno Día")
+        st.subheader("Turno Día")
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            hora_ingreso_dia = st.time_input("Hora ingreso", value=datetime.strptime("08:00", "%H:%M").time())
+            hora_ingreso_dia = st.time_input("Hora de ingreso", value=datetime.strptime("08:00", "%H:%M").time())
         with col2:
-            hora_salida_dia = st.time_input("Hora salida", value=datetime.strptime("17:00", "%H:%M").time())
+            hora_salida_dia = st.time_input("Hora de salida", value=datetime.strptime("17:00", "%H:%M").time())
         with col3:
             horas_dia = calcular_horas_trabajadas(
                 datetime.combine(datetime.today(), hora_ingreso_dia),
                 datetime.combine(datetime.today(), hora_salida_dia)
             )
-            st.metric("Horas trabajadas", f"{horas_dia:.2f}")
+            st.metric("Horas trabajadas (Día)", f"{horas_dia:.2f}")
 
         tarifa_dia, extra25_dia, extra35_dia = calcular_tarifas(
             sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Día"
         )
-
-        neto_dia, neto25_dia, neto35_dia, total_dia = calcular_netos(
-            horas_dia, tarifa_dia, extra25_dia, extra35_dia
-        )
+        neto_dia, neto25_dia, neto35_dia, total_dia = calcular_netos(horas_dia, tarifa_dia, extra25_dia, extra35_dia)
 
         st.write(f"Tarifa hora ordinaria: S/ {tarifa_dia:.2f}")
+        st.success(f"Neto por 8 horas: S/ {neto_dia:.2f}")
         st.success(f"Total turno día: S/ {total_dia:.2f}")
 
         # --- Información de pago ---
@@ -160,59 +157,184 @@ elif tipo_trabajador == "Obrero":
 
         year = 2025
         mes_num = list(calendar.month_name).index(mes_pago)
-        dias_en_mes = calendar.monthrange(year, mes_num)[1]
+        dias_mes = calendar.monthrange(year, mes_num)[1]
 
-        # --- SEMANAL ---
+        # --- Cálculo semanal ---
         if tipo_pago == "Semanal":
-            st.markdown("### 📅 Cálculo Semanal (Turno Día)")
-            pagos, dias_semana, pago_semana = [], [], 0
+            st.markdown("### 📅 Cuadro semanal (Turno Día)")
+            pagos = []
+            pago_semana = 0
+            dias_semana = []
 
-            for dia in range(1, dias_en_mes + 1):
+            for dia in range(1, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
+
                 if es_feriado(fecha) or nombre == "domingo":
                     pago = neto_dia
                     feriado_flag = "🟥" if es_feriado(fecha) else ""
                 else:
                     pago = total_dia
                     feriado_flag = ""
+
                 pagos.append(pago)
                 dias_semana.append((dia, nombre, pago, feriado_flag))
                 pago_semana += pago
 
-                if nombre == "viernes" or dia == dias_en_mes:
-                    st.markdown(f"**Semana que termina el {dia:02d} {mes_pago}:**")
+                if nombre == "viernes" or dia == dias_mes:
+                    st.markdown(f"**Semana que termina el viernes {dia:02d}:**")
                     for d, n, p, f in dias_semana:
                         st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
-                    st.success(f"**Total semana: S/ {pago_semana:.2f}**")
-                    dias_semana, pago_semana = [], 0
+                    st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
+                    pago_semana = 0
+                    dias_semana = []
 
+            total_mes = sum(pagos)
             st.markdown("---")
-            st.success(f"💰 **Total mensual ({mes_pago}): S/ {sum(pagos):.2f}**")
+            st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
 
-        # --- QUINCENAL ---
+        # --- Cálculo quincenal ---
         elif tipo_pago == "Quincenal":
-            st.markdown("### 📅 Cálculo Quincenal (Turno Día)")
+            st.markdown("### 📅 Cuadro quincenal (Turno Día)")
             pagos = []
+            pago_quincena = 0
+            dias_quincena = []
 
-            # Primera quincena
-            for dia in range(1, 16):
+            for dia in range(1, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
-                pago = neto_dia if (es_feriado(fecha) or nombre == "domingo") else total_dia
+
+                if es_feriado(fecha) or nombre == "domingo":
+                    pago = neto_dia
+                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                else:
+                    pago = total_dia
+                    feriado_flag = ""
+
                 pagos.append(pago)
-            total_q1 = sum(pagos)
-            st.success(f"**Total primera quincena: S/ {total_q1:.2f}**")
+                dias_quincena.append((dia, nombre, pago, feriado_flag))
+                pago_quincena += pago
 
-            # Segunda quincena
-            pagos2 = []
-            for dia in range(16, dias_en_mes + 1):
+                if dia in [15, dias_mes]:
+                    st.markdown(f"**Quincena hasta el día {dia:02d}:**")
+                    for d, n, p, f in dias_quincena:
+                        st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
+                    st.success(f"**Total quincena: S/ {pago_quincena:.2f}**")
+                    pago_quincena = 0
+                    dias_quincena = []
+
+            total_mes = sum(pagos)
+            st.markdown("---")
+            st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
+
+    # --- 🔹 Turno Rotativo ---
+    elif turno == "Rotativo":
+        st.subheader("Turno Rotativo (Noche o Día Alternado)")
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            hora_ingreso_rot = st.time_input("Hora de ingreso (Rotativo)", value=datetime.strptime("19:00", "%H:%M").time())
+        with col2:
+            hora_salida_rot = st.time_input("Hora de salida (Rotativo)", value=datetime.strptime("07:00", "%H:%M").time())
+        with col3:
+            horas_rot = calcular_horas_trabajadas(
+                datetime.combine(datetime.today(), hora_ingreso_rot),
+                datetime.combine(datetime.today(), hora_salida_rot)
+            )
+            st.metric("Horas trabajadas (Rotativo)", f"{horas_rot:.2f}")
+
+        tarifa_rot, extra25_rot, extra35_rot = calcular_tarifas(
+            sueldo_base, asignacion_familiar, dias_mes, afp_descuento, tipo_trabajador, "Noche - Rotativo"
+        )
+        neto_rot, neto25_rot, neto35_rot, total_rot = calcular_netos(horas_rot, tarifa_rot, extra25_rot, extra35_rot)
+
+        st.write(f"Tarifa hora ordinaria: S/ {tarifa_rot:.2f}")
+        st.write(f"Tarifa hora extra 25%: S/ {extra25_rot:.2f}")
+        st.write(f"Tarifa hora extra 35%: S/ {extra35_rot:.2f}")
+        st.success(f"Total turno rotativo: S/ {total_rot:.2f}")
+
+        # --- Información de pago ---
+        st.markdown("### 🗓️ Información de pago")
+        tipo_pago = st.selectbox("Tipo de pago", ["Semanal", "Quincenal"])
+        mes_pago = st.selectbox("Mes de pago", [calendar.month_name[i] for i in range(1, 13)])
+
+        year = 2025
+        mes_num = list(calendar.month_name).index(mes_pago)
+        dias_mes = calendar.monthrange(year, mes_num)[1]
+
+        # --- Cálculo semanal ---
+        if tipo_pago == "Semanal":
+            st.markdown("### 📅 Cuadro semanal (Turno Rotativo)")
+            pagos = []
+            pago_semana = 0
+            dias_semana = []
+
+            for dia in range(1, dias_mes + 1):
                 fecha = date(year, mes_num, dia)
                 nombre = nombre_dia(fecha)
-                pago = neto_dia if (es_feriado(fecha) or nombre == "domingo") else total_dia
-                pagos2.append(pago)
-            total_q2 = sum(pagos2)
 
-            st.success(f"**Total segunda quincena: S/ {total_q2:.2f}**")
+                if es_feriado(fecha) or nombre == "domingo":
+                    pago = neto_rot
+                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                else:
+                    pago = total_rot
+                    feriado_flag = ""
+
+                pagos.append(pago)
+                dias_semana.append((dia, nombre, pago, feriado_flag))
+                pago_semana += pago
+
+                if nombre == "viernes" or dia == dias_mes:
+                    st.markdown(f"**Semana que termina el viernes {dia:02d}:**")
+                    for d, n, p, f in dias_semana:
+                        st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
+                    st.success(f"**Total semana ({dias_semana[0][0]:02d}–{dia:02d}): S/ {pago_semana:.2f}**")
+                    pago_semana = 0
+                    dias_semana = []
+
+            total_mes = sum(pagos)
             st.markdown("---")
-            st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_q1 + total_q2:.2f}**")
+            st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
+
+        # --- Cálculo quincenal ---
+        elif tipo_pago == "Quincenal":
+            st.markdown("### 📅 Cuadro quincenal (Turno Rotativo)")
+            pagos = []
+            pago_quincena = 0
+            dias_quincena = []
+
+            for dia in range(1, dias_mes + 1):
+                fecha = date(year, mes_num, dia)
+                nombre = nombre_dia(fecha)
+
+                if es_feriado(fecha) or nombre == "domingo":
+                    pago = neto_rot
+                    feriado_flag = "🟥" if es_feriado(fecha) else ""
+                else:
+                    pago = total_rot
+                    feriado_flag = ""
+
+                pagos.append(pago)
+                dias_quincena.append((dia, nombre, pago, feriado_flag))
+                pago_quincena += pago
+
+                if dia in [15, dias_mes]:
+                    st.markdown(f"**Quincena hasta el día {dia:02d}:**")
+                    for d, n, p, f in dias_quincena:
+                        st.write(f"{d:02d} | {n.capitalize()} {f} | S/ {p:.2f}")
+                    st.success(f"**Total quincena: S/ {pago_quincena:.2f}**")
+                    pago_quincena = 0
+                    dias_quincena = []
+
+            total_mes = sum(pagos)
+            st.markdown("---")
+            st.success(f"💰 **Total mensual ({mes_pago}): S/ {total_mes:.2f}**")
+
+# --- 🔹 Nota final ---
+st.info("""
+📘 **Resumen general:**  
+Esta herramienta permite calcular el pago neto estimado de trabajadores Empleados y Obreros 
+según turno (Día o Rotativo), tipo de AFP/ONP, y frecuencia de pago (Semanal o Quincenal).  
+Considera refrigerio, feriados nacionales del 2025 y las tarifas de horas extras.
+""")
+            
